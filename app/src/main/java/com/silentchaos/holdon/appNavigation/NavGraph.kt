@@ -15,7 +15,7 @@ fun NavGraph() {
     val context = LocalContext.current
     val navController = rememberNavController()
      NavHost(navController = navController, startDestination = Route.Home.route) {
-         composable(Route.Home.route) { HomeScreen(navController,context) }
+         composable(Route.Home.route) { HomeScreen(navController) }
          composable(Route.Setting.route) { SettingScreen() }
          composable(Route.Info.route) { InfoScreen(navController) }
      }
