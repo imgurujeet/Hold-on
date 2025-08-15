@@ -3,6 +3,7 @@ package com.silentchaos.holdon.ui
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -24,7 +25,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -37,36 +37,23 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.silentchaos.holdon.R
 import com.silentchaos.holdon.appNavigation.Route
-import com.silentchaos.holdon.utils.isDeviceCharging
+import androidx.compose.ui.text.font.FontWeight
+import com.silentchaos.holdon.utils.rememberChargingStatus
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.text.font.FontWeight
-import com.silentchaos.holdon.receiver.ChargingReceiver
+import androidx.core.content.ContextCompat
+import com.silentchaos.holdon.service.AlarmService
+import com.silentchaos.holdon.ui.Components.TopBar
 
 
 @Composable
-fun HomeScreen(navController: NavController,context: Context) {
+fun HomeScreen(navController: NavController) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp
     val screenHeight = configuration.screenHeightDp
-
     val context = LocalContext.current
-    var isCharging by remember { mutableStateOf(isDeviceCharging(context)) }
-
-    val receiver = remember { ChargingReceiver { isCharging = it } }
-
-    // Register receiver only while this Composable is active
-    DisposableEffect(Unit) {
-        val filter = IntentFilter().apply {
-            addAction(Intent.ACTION_POWER_CONNECTED)
-            addAction(Intent.ACTION_POWER_DISCONNECTED)
-        }
-        context.registerReceiver(receiver, filter)
-
-        onDispose {
-            context.unregisterReceiver(receiver)
-        }
-    }
+    val isCharging = rememberChargingStatus()
+    var isObserving by remember { mutableStateOf(false) }
 
 
     Scaffold(
@@ -75,7 +62,6 @@ fun HomeScreen(navController: NavController,context: Context) {
         topBar = {
             TopBar(navController, screenWidth, screenHeight)
         },
-
         bottomBar = {
             Box(
                 modifier = Modifier
@@ -84,25 +70,36 @@ fun HomeScreen(navController: NavController,context: Context) {
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 Button(
-                    onClick = { },
-                    enabled = isCharging,
+                    onClick = {
+                        val serviceIntent = Intent(context, AlarmService::class.java)
+                        if (!isObserving) {
+                            // Start observing
+                            ContextCompat.startForegroundService(context, serviceIntent)
+                            isObserving = true
+                            Toast.makeText(context, "Started Observing", Toast.LENGTH_SHORT).show()
+                        } else {
+                            // Stop observing
+                            context.stopService(serviceIntent)
+                            isObserving = false
+                            Toast.makeText(context, "Stopped Observing", Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    enabled = isCharging, // You can still allow stopping even if not charging
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(screenHeight.dp * 0.05f)
                 ) {
                     Text(
-                        text = "Hold On",
+                        text = if (isObserving) "Stop Holding" else "Hold On",
                         modifier = Modifier.fillMaxWidth(),
-                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Thin),
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Thin
+                        ),
                         textAlign = TextAlign.Center
                     )
                 }
             }
         },
-
-
-
-
         content = { innerPadding ->
             Box(
                 modifier = Modifier
@@ -112,7 +109,8 @@ fun HomeScreen(navController: NavController,context: Context) {
             ) {
                 Icon(
                     painter = painterResource(
-                       if(isCharging) R.drawable.smartphone_charging else R.drawable.smartphone
+                        id = if (isCharging) R.drawable.smartphone_charging
+                        else R.drawable.smartphone
                     ),
                     contentDescription = "App Icon",
                     modifier = Modifier
@@ -127,40 +125,4 @@ fun HomeScreen(navController: NavController,context: Context) {
 
 
 
-
-@Composable
-fun TopBar(navController: NavController, screenWidth: Int, screenHeight: Int) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .windowInsetsPadding(WindowInsets.systemBars)
-
-    ) {
-        Icon(
-            imageVector = Icons.Default.Info,
-            contentDescription = "info Icon",
-            modifier = Modifier
-                .width(screenWidth.dp * 0.05f)
-                .height(screenHeight.dp * 0.05f)
-                .align (Alignment.CenterStart)
-                .clickable(
-                    onClick = { navController.navigate(Route.Info.route) } // Replace with your navigation logic
-                ),
-            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f))
-
-        Icon(
-            imageVector =Icons.Default.Settings,
-            contentDescription = "Settings Icon",
-            modifier = Modifier
-                .width(screenWidth.dp * 0.05f)
-                .height(screenHeight.dp * 0.05f)
-                .align(Alignment.CenterEnd)
-                .clickable(
-                    onClick = { navController.navigate(Route.Setting.route) } // Replace with your navigation logic
-                ),
-            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
-        )
-    }
-}
 

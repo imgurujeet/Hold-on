@@ -61,4 +61,5 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation("androidx.biometric:biometric:1.2.0-alpha05")
+    implementation("androidx.core:core-ktx:1.13.1")
 }
