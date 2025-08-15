@@ -73,25 +73,30 @@ fun HomeScreen(navController: NavController,context: Context) {
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
-            topBar(navController, screenWidth, screenHeight)
+            TopBar(navController, screenWidth, screenHeight)
         },
 
         bottomBar = {
-            Button(onClick ={ },
-            enabled = isCharging,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                                .height(screenHeight.dp * 0.075f)
-                                .windowInsetsPadding(WindowInsets.navigationBars),
-
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .windowInsetsPadding(WindowInsets.navigationBars) // Push above nav bar
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
-                Text(
-                    text = "Hold On",
+                Button(
+                    onClick = { },
+                    enabled = isCharging,
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Thin),
-                    textAlign = TextAlign.Center
-
-                )
+                        .fillMaxWidth()
+                        .height(screenHeight.dp * 0.05f)
+                ) {
+                    Text(
+                        text = "Hold On",
+                        modifier = Modifier.fillMaxWidth(),
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Thin),
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         },
 
@@ -124,7 +129,7 @@ fun HomeScreen(navController: NavController,context: Context) {
 
 
 @Composable
-fun topBar(navController: NavController, screenWidth: Int, screenHeight: Int) {
+fun TopBar(navController: NavController, screenWidth: Int, screenHeight: Int) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
