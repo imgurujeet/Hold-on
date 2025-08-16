@@ -1,4 +1,4 @@
-# ⚡ HoldOn – Anti-Theft Charging Protection App
+# ⚡ HoldOn – Charging Guard & Anti-Unplug Alarm
 ![Logo](https://raw.githubusercontent.com/imgurujeet/Hold-on/refs/heads/main/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp)
 
 > In trains, cafés, airports, or even at home, your phone is always at risk. HoldOn acts like your personal phone bodyguard — if someone unplugs it, a **loud alarm** goes off instantly to stop them in their tracks.
