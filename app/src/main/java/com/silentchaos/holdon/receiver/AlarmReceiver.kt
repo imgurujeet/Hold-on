@@ -21,25 +21,18 @@ class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
             Intent.ACTION_POWER_DISCONNECTED -> {
-                Log.d("AlarmReceiver", "Charger unplugged detected!")
-                try {
                     val serviceIntent = Intent(context, AlarmService::class.java)
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         context.startForegroundService(serviceIntent)
                     } else {
                         context.startService(serviceIntent)
                     }
-                } catch (e: Exception) {
-                    Log.e("AlarmReceiver", "Failed to start service: ${e.message}")
-                }
+
             }
             Intent.ACTION_POWER_CONNECTED -> {
-                Log.d("AlarmReceiver", "Charger plugged in!")
-                try {
                     context.stopService(Intent(context, AlarmService::class.java))
-                } catch (e: Exception) {
-                    Log.e("AlarmReceiver", "Failed to stop service: ${e.message}")
-                }
+
+
             }
         }
     }

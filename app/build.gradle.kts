@@ -1,3 +1,4 @@
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -62,4 +63,8 @@ dependencies {
 
     implementation("androidx.biometric:biometric:1.2.0-alpha05")
     implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.activity:activity-compose:1.8.0")
+    implementation("androidx.fragment:fragment-ktx:1.6.2")
+    implementation ("androidx.appcompat:appcompat:1.6.1")
+
 }
