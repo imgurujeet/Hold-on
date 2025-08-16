@@ -1,94 +1,89 @@
-# ⚡ HoldOn – Anti-Theft Charging Protection App  
+# ⚡ HoldOn – Anti-Theft Charging Protection App
+![Logo](https://raw.githubusercontent.com/imgurujeet/Hold-on/refs/heads/main/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp)
 
-> 🔒 **Your phone stays safe, even while charging in public.**  
-HoldOn is a smart Android app that protects your phone from theft when charging outside. If someone unplugs it, a **loud alarm** starts — and only *you* can stop it with fingerprint or lock-screen authentication.  
 
----
+>  **Your phone stays safe, even while charging in public.**  
+HoldOn is a smart Android app that protects your phone from theft when charging outside. If someone unplugs it, a **loud alarm** starts — and only *you* can stop it with fingerprint or lock-screen authentication.
 
-## 🎥 Demo Video  
-📹 *See HoldOn in action*  
-
-[![Watch the demo](https://img.youtube.com/vi/your_demo_video_id/maxresdefault.jpg)](https://youtu.be/your_demo_video_id)  
-*(Click the image to watch the video)*  
 
 ---
 
-## 📱 Screenshots  
+## 📱 Screenshots
 
-| Home Screen | Alarm Triggered | Authentication Prompt |  
-|-------------|-----------------|------------------------|  
-| ![Home](assets/screens/home.png) | ![Alarm](assets/screens/alarm.png) | ![Auth](assets/screens/auth.png) |  
+| ![App Screenshot](app/src/main/res/Assets/ss1.jpg) | ![App Screenshot](app/src/main/res/Assets/ss2.jpg) | ![App Screenshot](app/src/main/res/Assets/ss3.jpg) |  
 
 ---
 
-## ✨ Key Features  
+## ✨ Key Features
 
 ✅ **Anti-Theft Protection** – Detects charger unplug, triggers loud alarm.  
 ✅ **Biometric Security** – Fingerprint/Face unlock to stop alarm.  
 ✅ **Device Lock Fallback** – PIN, Pattern, or Password authentication.  
 ✅ **Custom Alarm Sound** – Uses your own `alarm_sound.mp3` from `res/raw/`.  
 ✅ **Foreground Service** – Keeps app alive with notification protection.  
-✅ **Modern UI** – Built with Jetpack Compose.  
+✅ **Modern UI** – Built with Jetpack Compose.
 
 ---
 
-## 📂 Project Structure  
+## 📂 Project Structure
+
+```plaintext
 com.silentchaos.holdon
-├── appNavigation/ → Navigation (NavGraph, Route)
-├── receiver/ → AlarmReceiver, ChargingReceiver
-├── service/ → AlarmService
-├── ui/ → Home, Settings, Info screens
-├── utils/ → ChargingHelper, FingerPrintHelper, PermissionUtils
-└── MainActivity.kt
+├── appNavigation/        → Navigation (NavGraph, Route)
+│   ├── NavGraph.kt
+│   └── Route.kt
+│
+├── receiver/             → BroadcastReceivers for events
+│   ├── AlarmReceiver.kt
+│   └── ChargingReceiver.kt
+│
+├── service/              → Foreground service for alarm
+│   └── AlarmService.kt
+│
+├── ui/                   → UI screens and components
+│   ├── Components/
+│   │   ├── CustomDropDown.kt
+│   │   ├── SocialCard.kt
+│   │   └── TopBar.kt
+│   │
+│   ├── theme/
+│   │   ├── HomeScreen.kt
+│   │   ├── InfoScreen.kt
+│   │   └── SettingScreen.kt
+│
+├── utils/                → Helpers & utilities
+│   ├── Auth.kt
+│   ├── ChargingHelper.kt
+│   └── SharedPreferences.kt
+│
+└── MainActivity.kt       → App entry point
+
+```
 
 
----
+## License
 
-## 🚀 Getting Started  
+[MIT](LICENSE)
 
-### Prerequisites  
-- Android Studio Ladybug+  
-- Kotlin 1.9+  
-- Android 8.0 (API 26) or above  
 
-### Installation  
+## Contributing
 
-1. Clone this repository:  
-   ```bash
-   git clone https://github.com/yourusername/HoldOn.git
-   cd HoldOn
-Add your alarm sound file:
+Contributions are always welcome!
 
-Place alarm_sound.mp3 in app/src/main/res/raw/.
+See `contributing.md` for ways to get started.
 
-Build & Run on your device 🎉
+Please adhere to this project's `code of conduct`.
 
-🔐 Authentication Flow
+## FAQ
 
-Connect your phone to a charger.
+#### Q1: Does HoldOn work when the app is closed?
+Yes, HoldOn runs as a **foreground service**, so it keeps monitoring even if you close the app.
 
-If unplugged → alarm rings loudly.
+#### Q2: Can I stop the alarm without fingerprint/lock authentication?
+No, the alarm can only be stopped via **biometric or lock-screen authentication** for maximum security.
 
-To stop → Authenticate with fingerprint/face or device credentials.
+#### Q3: Will the app drain my battery?
+No, HoldOn is lightweight and only monitors the charging state, so it uses minimal battery.
 
-🛡️ Permissions
-
-FOREGROUND_SERVICE – Keeps alarm running.
-
-USE_BIOMETRIC – Fingerprint/Face unlock.
-
-WAKE_LOCK – Ensures alarm is always active.
-
-🤝 Contributing
-
-Pull requests are welcome!
-
-Fork the repo
-
-Create a feature branch
-
-Submit a PR 🚀
-
-📜 License
-
-MIT License © 2025 [Your Name]
+#### Q4: Can I customize the alarm sound?
+Yes, you can set your own alarm sound from `res/raw/` or future settings updates.  
