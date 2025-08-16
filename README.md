@@ -48,10 +48,10 @@ com.silentchaos.holdon
 │   │   ├── SocialCard.kt
 │   │   └── TopBar.kt
 │   │
-│   ├── theme/
-│   │   ├── HomeScreen.kt
-│   │   ├── InfoScreen.kt
-│   │   └── SettingScreen.kt
+│   ├── theme/            → Theme and styles
+│   ├── HomeScreen.kt
+│   ├── InfoScreen.kt
+│   └── SettingScreen.kt
 │
 ├── utils/                → Helpers & utilities
 │   ├── Auth.kt
@@ -65,12 +65,12 @@ com.silentchaos.holdon
 
 ## License
 
-[MIT](LICENSE.md)
+[MIT](blob/main/LICENSE.md)
 
 
 ## Contributing
 
-Want to help? Please check out the notes in [CONTRIBUTE.md](CONTRIBUTING.md) first.
+Want to help? Please check out the notes in [CONTRIBUTE.md](blob/main/CONTRIBUTE.md) first.
 
 
 ## FAQ
