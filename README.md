@@ -10,7 +10,11 @@ HoldOn is a smart Android app that protects your phone from theft when charging 
 
 ## 📱 Screenshots
 
-| ![App Screenshot](app/src/main/res/Assets/ss1.jpg) | ![App Screenshot](app/src/main/res/Assets/ss2.jpg) | ![App Screenshot](app/src/main/res/Assets/ss3.jpg) |  
+## 📱 Screenshots
+
+<img src="app/src/main/res/Assets/ss1.jpg" width="240"/> 
+<img src="app/src/main/res/Assets/ss2.jpg" width="240"/> 
+<img src="app/src/main/res/Assets/ss3.jpg" width="240"/>
 
 ---
 
