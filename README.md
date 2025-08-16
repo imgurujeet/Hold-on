@@ -10,19 +10,19 @@ HoldOn is a smart Android app that protects your phone from theft when charging 
 
 ## 📱 Screenshots
 
-<img src="app/src/main/res/Assets/ss1.jpg" width="240"/> <img src="app/src/main/res/Assets/ss2.jpg" width="240"/> <img src="app/src/main/res/Assets/ss3.jpg" width="240"/>
+<img src="app/src/main/res/Assets/ss1.png" width="240"/> <img src="app/src/main/res/Assets/ss2.png" width="240"/> <img src="app/src/main/res/Assets/ss3.png" width="240"/>
 
 
 ---
 
 ## ✨ Key Features
 
-✅ **Anti-Theft Protection** – Detects charger unplug, triggers loud alarm.  
-✅ **Biometric Security** – Fingerprint/Face unlock to stop alarm.  
-✅ **Device Lock Fallback** – PIN, Pattern, or Password authentication.  
-✅ **Custom Alarm Sound** – Uses your own `alarm_sound.mp3` from `res/raw/`.  
-✅ **Foreground Service** – Keeps app alive with notification protection.  
-✅ **Modern UI** – Built with Jetpack Compose.
+ **Anti-Theft Protection** – Detects charger unplug, triggers loud alarm.  
+ **Biometric Security** – Fingerprint/Face unlock to stop alarm.  
+ **Device Lock Fallback** – PIN, Pattern, or Password authentication.  
+ **Custom Alarm Sound** – Uses your own `alarm_sound.mp3` from `res/raw/`.
+ **Foreground Service** – Keeps app alive with notification protection.  
+ **Modern UI** – Built with Jetpack Compose.
 
 ---
 
