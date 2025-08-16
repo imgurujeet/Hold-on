@@ -1,6 +1,7 @@
 # ⚡ HoldOn – Anti-Theft Charging Protection App
 ![Logo](https://raw.githubusercontent.com/imgurujeet/Hold-on/refs/heads/main/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp)
 
+> In train, cafés, airport, or crowded places, your phone is at risk. Hold On acts as your phone’s security guard — if someone unplugs it, a loud alarm goes off instantly to deter theft
 
 >  **Your phone stays safe, even while charging in public.**  
 HoldOn is a smart Android app that protects your phone from theft when charging outside. If someone unplugs it, a **loud alarm** starts — and only *you* can stop it with fingerprint or lock-screen authentication.
