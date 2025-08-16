@@ -1,27 +1,29 @@
 # ⚡ HoldOn – Anti-Theft Charging Protection App
 ![Logo](https://raw.githubusercontent.com/imgurujeet/Hold-on/refs/heads/main/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp)
 
+> In trains, cafés, airports, or even at home, your phone is always at risk. HoldOn acts like your personal phone bodyguard — if someone unplugs it, a **loud alarm** goes off instantly to stop them in their tracks.
 
->  **Your phone stays safe, even while charging in public.**  
-HoldOn is a smart Android app that protects your phone from theft when charging outside. If someone unplugs it, a **loud alarm** starts — and only *you* can stop it with fingerprint or lock-screen authentication.
+> ⚡ **Even if you leave your phone charging at home and someone unplugs it, HoldOn has your back.**  
+HoldOn is a smart Android app that protects your phone from theft or unauthorized unplugging. The alarm is loud enough to grab your attention, and only *you* can stop it using fingerprint or lock-screen authentication.
 
 
 ---
 
 ## 📱 Screenshots
 
-| ![App Screenshot](app/src/main/res/Assets/ss1.jpg) | ![App Screenshot](app/src/main/res/Assets/ss2.jpg) | ![App Screenshot](app/src/main/res/Assets/ss3.jpg) |  
+<img src="app/src/main/res/Assets/ss1.png" width="240"/> <img src="app/src/main/res/Assets/ss2.png" width="240"/> <img src="app/src/main/res/Assets/ss3.png" width="240"/>
+
 
 ---
 
 ## ✨ Key Features
 
-✅ **Anti-Theft Protection** – Detects charger unplug, triggers loud alarm.  
-✅ **Biometric Security** – Fingerprint/Face unlock to stop alarm.  
-✅ **Device Lock Fallback** – PIN, Pattern, or Password authentication.  
-✅ **Custom Alarm Sound** – Uses your own `alarm_sound.mp3` from `res/raw/`.  
-✅ **Foreground Service** – Keeps app alive with notification protection.  
-✅ **Modern UI** – Built with Jetpack Compose.
+ **Anti-Theft Protection** – Detects charger unplug, triggers loud alarm.  
+ **Biometric Security** – Fingerprint/Face unlock to stop alarm.  
+ **Device Lock Fallback** – PIN, Pattern, or Password authentication.  
+ **Custom Alarm Sound** – Uses your own `alarm_sound.mp3` from `res/raw/`.
+ **Foreground Service** – Keeps app alive with notification protection.  
+ **Modern UI** – Built with Jetpack Compose.
 
 ---
 
@@ -63,16 +65,13 @@ com.silentchaos.holdon
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE.md)
 
 
 ## Contributing
 
-Contributions are always welcome!
+Want to help? Please check out the notes in [CONTRIBUTE.md](CONTRIBUTING.md) first.
 
-See `contributing.md` for ways to get started.
-
-Please adhere to this project's `code of conduct`.
 
 ## FAQ
 
