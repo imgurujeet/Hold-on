@@ -6,7 +6,7 @@
 > ⚡ **Even if you leave your phone charging at home and someone unplugs it, HoldOn has your back.**  
 HoldOn is a smart Android app that protects your phone from theft or unauthorized unplugging. The alarm is loud enough to grab your attention, and only *you* can stop it using fingerprint or lock-screen authentication.
 
-
+[Download Here](https://github.com/imgurujeet/Hold-on/releases/download/release/app-release.apk)
 ---
 
 ## 📱 Screenshots
