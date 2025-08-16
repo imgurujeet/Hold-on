@@ -82,7 +82,7 @@ fun InfoScreen(navController: NavController) {
             ) {
                 Text(
                     text = "Why Hold On?",
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Thin),
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 Text(

@@ -14,6 +14,7 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.silentchaos.holdon.R
+import com.silentchaos.holdon.utils.SharedPreferencesHelper
 
 class AlarmService : Service() {
 
@@ -43,8 +44,8 @@ class AlarmService : Service() {
     }
 
     private fun startForegroundServiceWithNotification() {
-        val channelId = "anti_theft_service"
-        val channelName = "Anti Theft Service"
+        val channelId = "HoldOnServiceChannel"
+        val channelName = "Hold On Service"
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val chan = NotificationChannel(
@@ -65,9 +66,9 @@ class AlarmService : Service() {
         }
 
         val notification: Notification = NotificationCompat.Builder(this, channelId)
-            .setContentTitle("HoldOn Anti-Theft")
-            .setContentText("Observing charging state...")
-            .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
+            .setContentTitle("Hold on")
+            .setContentText("Running in the background")
+            .setSmallIcon(android.R.drawable.ic_menu_view)
             .setOngoing(true) // makes it sticky
             .build()
 
@@ -77,8 +78,8 @@ class AlarmService : Service() {
     private fun triggerAlarm() {
         if (!isAlarmActive) {
             isAlarmActive = true
-            // Play custom alarm sound
-            mediaPlayer = MediaPlayer.create(this, R.raw.alarm_sound).apply {
+            val soundResId = SharedPreferencesHelper.getAlarmSound(this)
+            mediaPlayer = MediaPlayer.create(this, soundResId).apply {
                 isLooping = true
                 start()
             }
