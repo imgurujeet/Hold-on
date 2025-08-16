@@ -70,11 +70,7 @@ com.silentchaos.holdon
 
 ## Contributing
 
-Contributions are always welcome!
-
-See `contributing.md` for ways to get started.
-
-Please adhere to this project's `code of conduct`.
+Want to help? Please check out the notes in CONTRIBUTE.md first.
 
 ## FAQ
 
