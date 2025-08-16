@@ -2,7 +2,9 @@ package com.silentchaos.holdon.ui
 
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -128,22 +130,29 @@ fun HomeScreen(navController: NavController) {
             }
         },
         content = { innerPadding ->
-            Box(
+            Column (
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding),
-                contentAlignment = Alignment.Center
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Icon(
                     painter = painterResource(
                         id = if (isCharging) R.drawable.smartphone_charging
                         else R.drawable.smartphone
                     ),
+
                     contentDescription = "App Icon",
                     modifier = Modifier
                         .width(screenWidth.dp * 0.2f)
                         .height(screenHeight.dp * 0.2f),
                     tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                )
+                Text(
+                    text= if (!isCharging) "Plug in your charger" else "Charging",
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Thin),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                 )
             }
         }
