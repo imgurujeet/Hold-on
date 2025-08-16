@@ -70,7 +70,8 @@ com.silentchaos.holdon
 
 ## Contributing
 
-Want to help? Please check out the notes in CONTRIBUTE.md first.
+Want to help? Please check out the notes in [CONTRIBUTE.md](CONTRIBUTING.md) first.
+
 
 ## FAQ
 
