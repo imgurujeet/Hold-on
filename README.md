@@ -48,10 +48,10 @@ com.silentchaos.holdon
 │   │   ├── SocialCard.kt
 │   │   └── TopBar.kt
 │   │
-│   ├── theme/
-│   │   ├── HomeScreen.kt
-│   │   ├── InfoScreen.kt
-│   │   └── SettingScreen.kt
+│   ├── theme/            → Theme and styles
+│   ├── HomeScreen.kt
+│   ├── InfoScreen.kt
+│   └── SettingScreen.kt
 │
 ├── utils/                → Helpers & utilities
 │   ├── Auth.kt
