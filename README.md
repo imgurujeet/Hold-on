@@ -85,4 +85,4 @@ No, the alarm can only be stopped via **biometric or lock-screen authentication*
 No, HoldOn is lightweight and only monitors the charging state, so it uses minimal battery.
 
 #### Q4: Can I customize the alarm sound?
-Yes, you can set your own alarm sound from setting with availabe sounds will be adding more with future updats  
+Yes, you can set your own alarm sound from setting with availabe sounds will be adding more with future updates
