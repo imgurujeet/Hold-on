@@ -6,7 +6,10 @@
 > ⚡ **Even if you leave your phone charging at home and someone unplugs it, HoldOn has your back.**  
 HoldOn is a smart Android app that protects your phone from theft or unauthorized unplugging. The alarm is loud enough to grab your attention, and only *you* can stop it using fingerprint or lock-screen authentication.
 
-[Download Here](https://github.com/imgurujeet/Hold-on/releases/download/release/app-release.apk)
+[Download Here](https://github.com/imgurujeet/Hold-on/releases/download/release/app-release.apk)  
+
+<a href='https://indusapp.store/3gju9x10'><img alt='Get it on Indus Appstore' src='https://docstore.indusappstore.com/public/external/developerdashboard-static/badge-white-background-english.png' width='200'/></a>
+
 ---
 
 ## 📱 Screenshots
@@ -21,7 +24,7 @@ HoldOn is a smart Android app that protects your phone from theft or unauthorize
  **Anti-Theft Protection** – Detects charger unplug, triggers loud alarm.  
  **Biometric Security** – Fingerprint/Face unlock to stop alarm.  
  **Device Lock Fallback** – PIN, Pattern, or Password authentication.  
- **Custom Alarm Sound** – Uses your own `alarm_sound.mp3` from `res/raw/`.
+ **Custom Alarm Sound** – Uses your own `alarm_sound.mp3` from `res/raw/`.  
  **Foreground Service** – Keeps app alive with notification protection.  
  **Modern UI** – Built with Jetpack Compose.
 
@@ -59,6 +62,8 @@ com.silentchaos.holdon
 │   └── SharedPreferences.kt
 │
 └── MainActivity.kt       → App entry point
+
+
 
 ```
 
