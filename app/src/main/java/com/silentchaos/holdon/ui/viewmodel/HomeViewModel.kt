@@ -38,11 +38,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     init {
+        //  Observe only MUSIC volume changes
         application.contentResolver.registerContentObserver(
             Settings.System.CONTENT_URI,
             true,
             volumeObserver
         )
+        updateVolumeOnly()
     }
 
     fun updateState(isCharging: Boolean, isObserving: Boolean) {
@@ -56,6 +58,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             buttonText = if (isObserving) "Disarm" else "Hold On",
             chargingText = if (isCharging) "Charging" else "Plug in your charger"
         )
+
     }
 
     private fun updateVolumeOnly() {
@@ -69,6 +72,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         val percent = (current.toFloat() / max) * 100
         return percent < 50
     }
+
+
+
 
     override fun onCleared() {
         getApplication<Application>().contentResolver
