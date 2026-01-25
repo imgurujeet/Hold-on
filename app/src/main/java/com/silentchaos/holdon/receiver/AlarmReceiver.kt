@@ -22,11 +22,7 @@ class AlarmReceiver : BroadcastReceiver() {
         when (intent.action) {
             Intent.ACTION_POWER_DISCONNECTED -> {
                     val serviceIntent = Intent(context, AlarmService::class.java)
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        context.startForegroundService(serviceIntent)
-                    } else {
-                        context.startService(serviceIntent)
-                    }
+                context.startForegroundService(serviceIntent)
 
             }
             Intent.ACTION_POWER_CONNECTED -> {

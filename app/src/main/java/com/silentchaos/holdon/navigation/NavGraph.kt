@@ -1,4 +1,4 @@
-package com.silentchaos.holdon.appNavigation
+package com.silentchaos.holdon.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext

@@ -47,23 +47,21 @@ class AlarmService : Service() {
         val channelId = "HoldOnServiceChannel"
         val channelName = "Hold On Service"
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val chan = NotificationChannel(
-                channelId,
-                channelName,
-                NotificationManager.IMPORTANCE_HIGH // high to play sound
-            ).apply {
-                setSound(
-                    null, // handled by MediaPlayer
-                    AudioAttributes.Builder()
-                        .setUsage(AudioAttributes.USAGE_ALARM)
-                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                        .build()
-                )
-            }
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(chan)
+        val chan = NotificationChannel(
+            channelId,
+            channelName,
+            NotificationManager.IMPORTANCE_HIGH // high to play sound
+        ).apply {
+            setSound(
+                null, // handled by MediaPlayer
+                AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_ALARM)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+            )
         }
+        val manager = getSystemService(NotificationManager::class.java)
+        manager.createNotificationChannel(chan)
 
         val notification: Notification = NotificationCompat.Builder(this, channelId)
             .setContentTitle("Hold on")

@@ -22,7 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.silentchaos.holdon.appNavigation.Route
+import com.silentchaos.holdon.navigation.Route
 
 @Composable
 fun TopBar(navController: NavController, screenWidth: Int, screenHeight: Int) {
@@ -41,7 +41,7 @@ fun TopBar(navController: NavController, screenWidth: Int, screenHeight: Int) {
                 .height(screenHeight.dp * 0.05f)
                 .align (Alignment.CenterStart)
                 .clickable(
-                    onClick = { navController.navigate(Route.Info.route) } // Replace with your navigation logic
+                    onClick = { navController.navigate(Route.Info.route) }
                 ),
             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f))
 
@@ -53,7 +53,7 @@ fun TopBar(navController: NavController, screenWidth: Int, screenHeight: Int) {
                 .height(screenHeight.dp * 0.05f)
                 .align(Alignment.CenterEnd)
                 .clickable(
-                    onClick = { navController.navigate(Route.Setting.route) } // Replace with your navigation logic
+                    onClick = { navController.navigate(Route.Setting.route) }
                 ),
             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
         )
