@@ -13,8 +13,9 @@ HoldOn is a smart Android app that protects your phone from theft or unauthorize
 ---
 
 ## 📱 Screenshots
+<img src="https://raw.githubusercontent.com/imgurujeet/Hold-on/refs/heads/screenshots/1255%403x.png" width="150"/> <img src="https://raw.githubusercontent.com/imgurujeet/Hold-on/refs/heads/screenshots/1256%403x.png" width="150"/> <img src="https://raw.githubusercontent.com/imgurujeet/Hold-on/refs/heads/screenshots/1257%403x.png" width="150"/> <img src="https://raw.githubusercontent.com/imgurujeet/Hold-on/refs/heads/screenshots/1258%403x.png" width="150"/> <img src="https://raw.githubusercontent.com/imgurujeet/Hold-on/refs/heads/screenshots/1260%403x.png" width="150"/>
 
-<img src="app/src/main/res/Assets/ss1.png" width="240"/> <img src="app/src/main/res/Assets/ss2.png" width="240"/> <img src="app/src/main/res/Assets/ss3.png" width="240"/>
+>
 
 
 ---
