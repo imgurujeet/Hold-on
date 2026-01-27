@@ -22,14 +22,5 @@ object SharedPreferencesHelper {
         return prefs.getInt(KEY_ALARM_SOUND, R.raw.alarm_sound)
     }
 
-    fun setServiceRunning(context: Context, running: Boolean) {
-        val prefs = context.getSharedPreferences("service_prefs", Context.MODE_PRIVATE)
-        prefs.edit { putBoolean("is_running", running) }
-    }
-
-    fun isServiceRunning(context: Context): Boolean {
-        val prefs = context.getSharedPreferences("service_prefs", Context.MODE_PRIVATE)
-        return prefs.getBoolean("is_running", false)
-    }
 
 }

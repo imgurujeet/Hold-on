@@ -147,7 +147,7 @@ fun SettingScreen(navController: NavController) {
             // Instagram
                SocialCard(
                    name = "Instagram",
-                   url = "https://www.instagram.com/narwhal.25.1.1",
+                   url = "https://www.instagram.com/imgurujeet",
                    onClick = {
                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.instagram.com/narwhal.25.1.1"))
                        ContextCompat.startActivity(context, intent, null)

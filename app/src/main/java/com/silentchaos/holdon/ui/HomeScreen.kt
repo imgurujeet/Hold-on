@@ -26,8 +26,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -40,17 +38,11 @@ import com.silentchaos.holdon.R
 import androidx.compose.ui.text.font.FontWeight
 import com.silentchaos.holdon.utils.rememberChargingStatus
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.silentchaos.holdon.service.AlarmService
 import com.silentchaos.holdon.ui.Components.TopBar
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.rememberNavController
 import authenticateAndStopService
 import com.silentchaos.holdon.ui.viewmodel.HomeViewModel
 
@@ -66,28 +58,29 @@ fun HomeScreen(navController: NavController) {
     val activity = context as? FragmentActivity
 
     val isCharging = rememberChargingStatus()
-    var isObserving by remember { mutableStateOf(false) }
+
+
 
     val viewModel: HomeViewModel = viewModel()
     val uiState by viewModel.uiState.collectAsState()
 
-    // Update VM when charging or observing changes
-    LaunchedEffect(isCharging, isObserving) {
-        viewModel.updateState(isCharging, isObserving)
-    }
-
-    // Auto stop when unplugged
     LaunchedEffect(isCharging) {
+        if (uiState.isCharging != isCharging) {
+            viewModel.updateState(isCharging, uiState.isObserving)
+        }
+
         if (uiState.isObserving && !isCharging) {
             activity?.let {
                 authenticateAndStopService(it) {
                     context.stopService(Intent(context, AlarmService::class.java))
-                    isObserving = false
+                    viewModel.setObserving(false, isCharging)
                     Toast.makeText(context, "Service stopped - Charger unplugged", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
+
+
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -106,18 +99,19 @@ fun HomeScreen(navController: NavController) {
                     onClick = {
                         val serviceIntent = Intent(context, AlarmService::class.java)
 
-                        if (!isObserving) {
+                        if (!uiState.isObserving) {
                             ContextCompat.startForegroundService(context, serviceIntent)
-                            isObserving = true
+                            viewModel.setObserving(true, isCharging)
                         } else {
                             activity?.let {
                                 authenticateAndStopService(it) {
                                     context.stopService(serviceIntent)
-                                    isObserving = false
+                                    viewModel.setObserving(false, isCharging)
                                 }
                             }
                         }
                     },
+
                     enabled = uiState.buttonEnabled,
                     modifier = Modifier
                         .fillMaxWidth()
