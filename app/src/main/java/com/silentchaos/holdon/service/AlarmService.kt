@@ -3,6 +3,7 @@ package com.silentchaos.holdon.service
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -18,6 +19,7 @@ import android.os.IBinder
 import android.os.Looper
 import android.provider.Settings
 import androidx.core.app.NotificationCompat
+import com.silentchaos.holdon.MainActivity
 import com.silentchaos.holdon.R
 import com.silentchaos.holdon.utils.SharedPreferencesHelper
 
@@ -107,11 +109,24 @@ class AlarmService : Service() {
         val manager = getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(chan)
 
+        // Intent to open app when clicked
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         val notification: Notification = NotificationCompat.Builder(this, channelId)
             .setContentTitle("Hold on")
             .setContentText("Running in the background")
             .setSmallIcon(android.R.drawable.ic_menu_view)
             .setOngoing(true) // makes it sticky
+            .setContentIntent(pendingIntent)
             .build()
 
         startForeground(1, notification)
