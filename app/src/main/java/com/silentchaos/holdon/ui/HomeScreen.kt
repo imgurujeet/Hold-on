@@ -33,7 +33,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.silentchaos.holdon.R
 import androidx.compose.ui.text.font.FontWeight
 import com.silentchaos.holdon.utils.rememberChargingStatus
@@ -48,8 +47,7 @@ import com.silentchaos.holdon.ui.viewmodel.HomeViewModel
 
 
 @Composable
-fun HomeScreen(navController: NavController) {
-
+fun HomeScreen( onInfoClick : () -> Unit,onSettingClick : () -> Unit) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp
     val screenHeight = configuration.screenHeightDp
@@ -86,7 +84,7 @@ fun HomeScreen(navController: NavController) {
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
-            TopBar(navController, screenWidth, screenHeight)
+            TopBar( onInfoClick , onSettingClick, screenWidth, screenHeight)
         },
         bottomBar = {
             Box(

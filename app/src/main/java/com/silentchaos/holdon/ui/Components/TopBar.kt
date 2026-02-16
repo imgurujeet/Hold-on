@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
@@ -21,11 +22,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.silentchaos.holdon.navigation.Route
 
 @Composable
-fun TopBar(navController: NavController, screenWidth: Int, screenHeight: Int) {
+fun TopBar(onInfoClick : () -> Unit,onSettingClick : () -> Unit, screenWidth: Int, screenHeight: Int) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -41,7 +40,7 @@ fun TopBar(navController: NavController, screenWidth: Int, screenHeight: Int) {
                 .height(screenHeight.dp * 0.05f)
                 .align (Alignment.CenterStart)
                 .clickable(
-                    onClick = { navController.navigate(Route.Info.route) }
+                    onClick = { onInfoClick() }
                 ),
             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f))
 
@@ -53,7 +52,7 @@ fun TopBar(navController: NavController, screenWidth: Int, screenHeight: Int) {
                 .height(screenHeight.dp * 0.05f)
                 .align(Alignment.CenterEnd)
                 .clickable(
-                    onClick = { navController.navigate(Route.Setting.route) }
+                    onClick = { onSettingClick() }
                 ),
             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
         )
@@ -62,7 +61,7 @@ fun TopBar(navController: NavController, screenWidth: Int, screenHeight: Int) {
 
 
 @Composable
-fun  topBarSettingScreen(navController: NavController, screenWidth: Int, screenHeight: Int){
+fun  TopBarSettingScreen(onBackClick : () -> Unit, screenWidth: Int, screenHeight: Int){
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -77,7 +76,7 @@ fun  topBarSettingScreen(navController: NavController, screenWidth: Int, screenH
                 .height(screenHeight.dp * 0.08f)
                 .padding(end = 8.dp)
                 .clickable(
-                    onClick = { navController.popBackStack() } // Replace with your navigation logic
+                    onClick = { onBackClick() } // Replace with your navigation logic
                 ),
             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f))
         Text(

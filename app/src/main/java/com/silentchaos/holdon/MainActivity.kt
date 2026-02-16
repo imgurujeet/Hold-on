@@ -10,7 +10,7 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.fragment.app.FragmentActivity
-import com.silentchaos.holdon.navigation.NavGraph
+import com.silentchaos.holdon.navigation.AppNavigation
 import com.silentchaos.holdon.ui.theme.HoldOnTheme
 
 class MainActivity : FragmentActivity() {
@@ -27,7 +27,7 @@ class MainActivity : FragmentActivity() {
                     }
                 }
 
-                NavGraph()
+                AppNavigation()
             }
         }
     }

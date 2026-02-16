@@ -1,4 +1,5 @@
 import android.widget.Toast
+import androidx.biometric.BiometricManager
 import androidx.core.app.ComponentActivity
 import androidx.core.content.ContextCompat
 
@@ -7,22 +8,34 @@ fun authenticateAndStopService(
     stopServiceAction: () -> Unit
 ) {
     // Check if biometric authentication is available
-    val biometricManager = androidx.biometric.BiometricManager.from(activity)
-    when (biometricManager.canAuthenticate(androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK or androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL)) {
-        androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS -> {
+    val biometricManager = BiometricManager.from(activity)
+    when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK or BiometricManager.Authenticators.DEVICE_CREDENTIAL)) {
+        BiometricManager.BIOMETRIC_SUCCESS -> {
             // Biometric features are available
         }
-        androidx.biometric.BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> {
+        BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> {
             Toast.makeText(activity, "No biometric features available on this device", Toast.LENGTH_SHORT).show()
             return
         }
-        androidx.biometric.BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> {
+        BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> {
             Toast.makeText(activity, "Biometric features are currently unavailable", Toast.LENGTH_SHORT).show()
             return
         }
-        androidx.biometric.BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
+        BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
             Toast.makeText(activity, "No biometric credentials enrolled", Toast.LENGTH_SHORT).show()
             return
+        }
+
+        BiometricManager.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED -> {
+            TODO()
+        }
+
+        BiometricManager.BIOMETRIC_ERROR_UNSUPPORTED -> {
+            TODO()
+        }
+
+        BiometricManager.BIOMETRIC_STATUS_UNKNOWN -> {
+            TODO()
         }
     }
 

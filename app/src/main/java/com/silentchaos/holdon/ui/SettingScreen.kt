@@ -1,7 +1,6 @@
 package com.silentchaos.holdon.ui
 
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -28,15 +27,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.silentchaos.holdon.R
-import androidx.navigation.NavController
 import com.silentchaos.holdon.ui.Components.CustomAlarmSoundDropdown
 import com.silentchaos.holdon.ui.Components.SocialCard
-import com.silentchaos.holdon.ui.Components.topBarSettingScreen
+import com.silentchaos.holdon.ui.Components.TopBarSettingScreen
 import com.silentchaos.holdon.utils.SharedPreferencesHelper
+import androidx.core.net.toUri
 
 
 @Composable
-fun SettingScreen(navController: NavController) {
+fun SettingScreen(onBackClick :() -> Unit) {
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp
@@ -49,12 +48,12 @@ fun SettingScreen(navController: NavController) {
         R.raw.alarm_sound3
     )
     val selectedSound = remember {
-        mutableStateOf(SharedPreferencesHelper.getAlarmSound(context) ?: R.raw.alarm_sound)
+        mutableStateOf(SharedPreferencesHelper.getAlarmSound(context))
     }
 
    Scaffold(
        topBar = {
-           topBarSettingScreen(navController, screenWidth, screenHeight)
+           TopBarSettingScreen(onBackClick, screenWidth, screenHeight)
 
        },
        content = { innerPadding ->
@@ -87,7 +86,7 @@ fun SettingScreen(navController: NavController) {
                    url = "https://x.com/imgurujeet",
                    onClick = {
                        // Handle Twitter click
-                       val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://x.com/imgurujeet"))
+                       val intent = Intent(Intent.ACTION_VIEW, "https://x.com/imgurujeet".toUri())
                        ContextCompat.startActivity(context, intent, null)
                    },
                    icon = {
@@ -107,7 +106,8 @@ fun SettingScreen(navController: NavController) {
                    name = "GitHub",
                    url = "https://github.com/imgurujeet",
                    onClick = {
-                       val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/imgurujeet"))
+                       val intent = Intent(Intent.ACTION_VIEW,
+                           "https://github.com/imgurujeet".toUri())
                        ContextCompat.startActivity(context, intent, null)
                    },
                    icon = {
@@ -128,7 +128,8 @@ fun SettingScreen(navController: NavController) {
                    name = "LinkedIn",
                    url = "https://www.linkedin.com/in/gurujeet-k-975b8a288/",
                    onClick = {
-                       val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.linkedin.com/in/gurujeet-k-975b8a288/"))
+                       val intent = Intent(Intent.ACTION_VIEW,
+                           "https://www.linkedin.com/in/gurujeet-k-975b8a288/".toUri())
                        ContextCompat.startActivity(context, intent, null)
                    },
                    icon = {
@@ -149,7 +150,8 @@ fun SettingScreen(navController: NavController) {
                    name = "Instagram",
                    url = "https://www.instagram.com/imgurujeet",
                    onClick = {
-                       val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.instagram.com/narwhal.25.1.1"))
+                       val intent = Intent(Intent.ACTION_VIEW,
+                           "https://www.instagram.com/narwhal.25.1.1".toUri())
                        ContextCompat.startActivity(context, intent, null)
                    },
                    icon = {
@@ -171,7 +173,7 @@ fun SettingScreen(navController: NavController) {
                    url = "mailto:imgurujeet@gmail.com",
                    onClick = {
                        val intent = Intent(Intent.ACTION_SENDTO).apply {
-                           data = Uri.parse("mailto:imgurujeet@gmail.com")
+                           data = "mailto:imgurujeet@gmail.com".toUri()
                        }
                        ContextCompat.startActivity(context, intent, null)
                    },

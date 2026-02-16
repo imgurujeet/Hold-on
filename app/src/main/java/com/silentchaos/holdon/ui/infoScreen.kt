@@ -23,10 +23,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 
 @Composable
-fun InfoScreen(navController: NavController) {
+fun InfoScreen(
+    onBackClick: () -> Unit
+) {
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp
@@ -52,7 +53,7 @@ fun InfoScreen(navController: NavController) {
                         .height(screenHeight.dp * 0.08f)
                         .padding(end = 8.dp)
                         .clickable(
-                            onClick = { navController.popBackStack() } // Replace with your navigation logic
+                            onClick = { onBackClick() } // Replace with your navigation logic
                         ),
                     tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f))
                 Text(

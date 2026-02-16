@@ -1,10 +1,15 @@
 package com.silentchaos.holdon.navigation
 
+import androidx.navigation3.runtime.NavKey
+import kotlinx.serialization.Serializable
 
-sealed class Route(
-    val route: String,
-) {
-    object Home : Route("home")
-    object Setting : Route("setting")
-    object Info : Route("info")
-}
+
+@Serializable
+data object Home : NavKey
+
+@Serializable
+data object  Setting : NavKey
+
+@Serializable
+data object Info : NavKey
+
