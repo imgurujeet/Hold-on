@@ -19,6 +19,7 @@ fun AppNavigation() {
         navConfig,
         Home
     )
+
     NavDisplay(
         backStack = backStack,
         entryProvider = { key ->
@@ -33,27 +34,26 @@ fun AppNavigation() {
 
                 Info -> NavEntry(key) {
                     InfoScreen(
-                        onBackClick = { if (backStack.size > 1) {
-                            backStack.removeLast()
-                        }
+                        onBackClick = {
+                            if (backStack.size > 1) {
+                                backStack.removeAt(backStack.lastIndex)
+                            }
                         }
                     )
-
                 }
 
                 Setting -> NavEntry(key) {
                     SettingScreen(
-                        onBackClick = { if (backStack.size > 1) {
-                            backStack.removeLast()
-                        }
+                        onBackClick = {
+                            if (backStack.size > 1) {
+                                backStack.removeAt(backStack.lastIndex)
+                            }
                         }
                     )
-
                 }
-                else ->
-                    throw IllegalArgumentException("Unknown key: $key")
+
+                else -> throw IllegalArgumentException("Unknown key: $key")
             }
         }
     )
-
 }
