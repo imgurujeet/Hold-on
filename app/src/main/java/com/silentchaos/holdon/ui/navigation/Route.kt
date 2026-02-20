@@ -1,4 +1,4 @@
-package com.silentchaos.holdon.navigation
+package com.silentchaos.holdon.ui.navigation
 
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable

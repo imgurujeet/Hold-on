@@ -30,8 +30,9 @@ import com.silentchaos.holdon.R
 import com.silentchaos.holdon.ui.Components.CustomAlarmSoundDropdown
 import com.silentchaos.holdon.ui.Components.SocialCard
 import com.silentchaos.holdon.ui.Components.TopBarSettingScreen
-import com.silentchaos.holdon.utils.SharedPreferencesHelper
 import androidx.core.net.toUri
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.silentchaos.holdon.ui.viewmodel.SettingsViewModel
 
 
 @Composable
@@ -41,15 +42,18 @@ fun SettingScreen(onBackClick :() -> Unit) {
     val screenWidth = configuration.screenWidthDp
     val screenHeight = configuration.screenHeightDp
 
+    val viewModel: SettingsViewModel = viewModel()
+    val uiState by viewModel.uiState.collectAsState()
+
+
+
+
     val sounds = listOf("Default", "Siren","Machinary")
     val soundResIds = listOf(
         R.raw.alarm_sound,
         R.raw.alarm_sound2,
         R.raw.alarm_sound3
     )
-    val selectedSound = remember {
-        mutableStateOf(SharedPreferencesHelper.getAlarmSound(context))
-    }
 
    Scaffold(
        topBar = {
@@ -67,11 +71,9 @@ fun SettingScreen(onBackClick :() -> Unit) {
                CustomAlarmSoundDropdown(
                    sounds = sounds,
                    soundResIds = soundResIds,
-                   selectedSound = selectedSound,
+                   selectedSound = uiState.selectedSound.let { mutableStateOf(it) },
                    onSoundSelected = { soundId ->
-                       selectedSound.value = soundId
-                       SharedPreferencesHelper.saveAlarmSound(context, soundId)
-
+                       viewModel.selectSound(soundId)
                    }
                )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -196,7 +198,7 @@ fun SettingScreen(onBackClick :() -> Unit) {
                    horizontalAlignment = Alignment.CenterHorizontally
                ) {
                    Text(
-                       text = "Made with 🫠 by Gurujeet",
+                       text = "HoldOn ${uiState.versionInfo}",
                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Thin),
                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                        modifier = Modifier

@@ -1,4 +1,4 @@
-package com.silentchaos.holdon.navigation
+package com.silentchaos.holdon.ui.navigation
 
 import android.os.Build
 import androidx.annotation.RequiresApi
