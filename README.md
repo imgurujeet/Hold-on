@@ -31,42 +31,6 @@ HoldOn is a smart Android app that protects your phone from theft or unauthorize
 
 ---
 
-## 📂 Project Structure
-
-```plaintext
-com.silentchaos.holdon
-├── appNavigation/        → Navigation (NavGraph, Route)
-│   ├── NavGraph.kt
-│   └── Route.kt
-│
-├── receiver/             → BroadcastReceivers for events
-│   ├── AlarmReceiver.kt
-│   └── ChargingReceiver.kt
-│
-├── service/              → Foreground service for alarm
-│   └── AlarmService.kt
-│
-├── ui/                   → UI screens and components
-│   ├── Components/
-│   │   ├── CustomDropDown.kt
-│   │   ├── SocialCard.kt
-│   │   └── TopBar.kt
-│   │
-│   ├── theme/            → Theme and styles
-│   ├── HomeScreen.kt
-│   ├── InfoScreen.kt
-│   └── SettingScreen.kt
-│
-├── utils/                → Helpers & utilities
-│   ├── Auth.kt
-│   ├── ChargingHelper.kt
-│   └── SharedPreferences.kt
-│
-└── MainActivity.kt       → App entry point
-
-
-
-```
 
 
 ## License
