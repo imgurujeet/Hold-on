@@ -9,12 +9,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import android.os.BatteryManager
 import androidx.core.app.NotificationCompat
-import com.silentchaos.holdon.R
 import com.silentchaos.holdon.alert.AlertAudioManager
 import com.silentchaos.holdon.alert.AlertNotificationManager
 import com.silentchaos.holdon.data.preferences.AppPreferencesImpl
 import com.silentchaos.holdon.detection.ChargerDetection
+import com.silentchaos.holdon.detection.PickPocketDetection
 
 class SecurityEngineService : Service() {
 
@@ -24,16 +25,25 @@ class SecurityEngineService : Service() {
 
         const val ACTION_START = "ACTION_START"
         const val ACTION_STOP = "ACTION_STOP"
+
+        const val EXTRA_MODE = "EXTRA_MODE"
+        const val MODE_CHARGER = "MODE_CHARGER"
+        const val MODE_PICKPOCKET = "MODE_PICKPOCKET"
     }
 
     private lateinit var chargerDetection: ChargerDetection
+    private lateinit var pickPocketDetection: PickPocketDetection
     private lateinit var alertController: AlertController
-    private var isEngineRunning = false
     private lateinit var preferences: AppPreferencesImpl
+
+    private var isEngineRunning = false
+    private var currentMode: String = MODE_CHARGER
 
     override fun onCreate() {
         super.onCreate()
+
         preferences = AppPreferencesImpl(applicationContext)
+
         val audioManager = AlertAudioManager(this)
         val notificationManager = AlertNotificationManager(this)
 
@@ -42,12 +52,20 @@ class SecurityEngineService : Service() {
             notificationManager = notificationManager,
             preferences = preferences
         )
+
         SecurityEngine.initialize(alertController)
 
         chargerDetection = ChargerDetection(
             context = this,
             onChargerRemoved = { SecurityEngine.onChargerRemoved() },
             onChargerConnected = { SecurityEngine.onChargerConnected() }
+        )
+
+        pickPocketDetection = PickPocketDetection(
+            context = this,
+            onSuspiciousMovement = {
+                SecurityEngine.onPickPocketDetected()
+            }
         )
     }
 
@@ -60,6 +78,10 @@ class SecurityEngineService : Service() {
         when (intent?.action) {
 
             ACTION_START -> {
+
+                currentMode = intent.getStringExtra(EXTRA_MODE)
+                    ?: MODE_CHARGER
+
                 startEngine()
             }
 
@@ -69,14 +91,13 @@ class SecurityEngineService : Service() {
             }
 
             null -> {
-                // If system restarts service
+                // System restarted service
                 startEngine()
             }
         }
 
         return START_STICKY
     }
-
 
     private fun startEngine() {
 
@@ -88,8 +109,25 @@ class SecurityEngineService : Service() {
             createForegroundNotification()
         )
 
-        chargerDetection.start()
-        SecurityEngine.startMonitoring()
+        when (currentMode) {
+
+            MODE_CHARGER -> {
+                chargerDetection.start()
+                SecurityEngine.startMonitoring()
+            }
+
+            MODE_PICKPOCKET -> {
+
+                if (isDeviceCharging()) {
+                    isEngineRunning = false
+                    stopForeground(STOP_FOREGROUND_REMOVE)
+                    return
+                }
+
+                SecurityEngine.startMonitoring()
+                pickPocketDetection.start()
+            }
+        }
     }
 
     private fun stopEngine() {
@@ -98,6 +136,8 @@ class SecurityEngineService : Service() {
         isEngineRunning = false
 
         chargerDetection.stop()
+        pickPocketDetection.stop()
+
         SecurityEngine.stopMonitoring()
 
         stopForeground(STOP_FOREGROUND_REMOVE)
@@ -107,12 +147,12 @@ class SecurityEngineService : Service() {
 
         if (isEngineRunning) {
             chargerDetection.stop()
+            pickPocketDetection.stop()
             SecurityEngine.stopMonitoring()
         }
 
         super.onDestroy()
     }
-
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -130,12 +170,33 @@ class SecurityEngineService : Service() {
             manager.createNotificationChannel(channel)
         }
 
+        val text = if (currentMode == MODE_PICKPOCKET)
+            "Monitoring pickpocket protection"
+        else
+            "Monitoring charger status"
+
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
             .setContentTitle("HoldOn Active")
-            .setContentText("Monitoring charger status")
+            .setContentText(text)
             .setOngoing(true)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .build()
+    }
+
+    private fun isDeviceCharging(): Boolean {
+
+        val batteryStatus = registerReceiver(
+            null,
+            android.content.IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+        )
+
+        val status = batteryStatus?.getIntExtra(
+            BatteryManager.EXTRA_STATUS,
+            -1
+        )
+
+        return status == BatteryManager.BATTERY_STATUS_CHARGING ||
+                status == BatteryManager.BATTERY_STATUS_FULL
     }
 }

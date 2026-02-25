@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat
 import com.silentchaos.holdon.R
 import com.silentchaos.holdon.engine.AlertType
 import com.silentchaos.holdon.ui.alarmAlert.AlarmAlertActivity
+import com.silentchaos.holdon.ui.pickPocketAlert.PickPocketAlertActivity
 
 class AlertNotificationManager(
     private val context: Context
@@ -25,7 +26,13 @@ class AlertNotificationManager(
 
         createChannel()
 
-        val fullScreenIntent = Intent(context, AlarmAlertActivity::class.java).apply {
+        val activityClass = when (type) {
+            AlertType.CHARGER -> AlarmAlertActivity::class.java
+            AlertType.PICKPOCKET -> PickPocketAlertActivity::class.java
+        }
+
+
+        val fullScreenIntent = Intent(context, activityClass).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or
                     Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
@@ -37,7 +44,7 @@ class AlertNotificationManager(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val stopIntent = Intent(context, AlarmAlertActivity::class.java).apply {
+        val stopIntent = Intent(context, activityClass).apply {
             action = "AUTH_FROM_NOTIFICATION"
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or
                     Intent.FLAG_ACTIVITY_CLEAR_TOP or

@@ -1,8 +1,13 @@
 package com.silentchaos.holdon.engine
 
+import android.content.Context
+import android.content.Intent
 import com.silentchaos.holdon.alert.AlertController
+import com.silentchaos.holdon.ui.ProtectionModeUI
+import com.silentchaos.holdon.ui.pickPocketAlert.PickPocketAlertActivity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlin.jvm.java
 
 object SecurityEngine {
 
@@ -15,11 +20,19 @@ object SecurityEngine {
 
     val state: StateFlow<SecurityState> = _state
 
+    private val _mode = MutableStateFlow(ProtectionModeUI.CHARGER)
+    val mode: StateFlow<ProtectionModeUI> = _mode
+
+    fun setMode(mode: ProtectionModeUI) {
+        _mode.value = mode
+    }
+
     // -----------------------------
     // Dependencies
     // -----------------------------
 
     private var alertController: AlertController? = null
+    private var isVerifying = false
 
     fun initialize(controller: AlertController) {
         alertController = controller
@@ -48,6 +61,7 @@ object SecurityEngine {
         if (_state.value != SecurityState.Monitoring) return
 
         _state.value = SecurityState.Alert(AlertType.CHARGER)
+        alertController?.showVerification(AlertType.CHARGER)
         alertController?.startAlert(AlertType.CHARGER)
     }
 
@@ -67,7 +81,32 @@ object SecurityEngine {
 
     fun stopAlert() {
         alertController?.stopAlert()
+        isVerifying = false
         _state.value = SecurityState.Idle
+    }
+
+
+
+    //PickPocket detection
+    fun onPickPocketDetected() {
+
+        if (isVerifying) return
+
+        isVerifying = true
+
+        _state.value = SecurityState.Alert(AlertType.PICKPOCKET)
+
+        //  Only show verification screen
+        alertController?.showVerification(AlertType.PICKPOCKET)
+    }
+
+    fun onPickPocketAuthenticationSuccess() {
+        isVerifying = false
+        _state.value = SecurityState.Idle
+    }
+
+    fun triggerPickPocketAlarm() {
+        alertController?.startAlert(AlertType.PICKPOCKET)
     }
 
 }

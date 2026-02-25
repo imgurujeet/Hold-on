@@ -15,6 +15,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.silentchaos.holdon.engine.SecurityEngine
 import com.silentchaos.holdon.engine.SecurityState
+import com.silentchaos.holdon.ui.ProtectionModeUI
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 data class HomeUiState(
+    val selectedMode: ProtectionModeUI = ProtectionModeUI.CHARGER,
     val isCharging: Boolean = false,
     val isMonitoring: Boolean = false,
     val isAlertActive: Boolean = false,
@@ -29,8 +31,7 @@ data class HomeUiState(
     val volumePercent: Int = 0,
     val batteryPercent: Int = 0,
     val buttonEnabled: Boolean = false,
-    val buttonText: String = "Hold On",
-    val chargingText: String = "Plug in your charger"
+    val buttonText: String = "Activate"
 )
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
@@ -42,6 +43,45 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState
+
+    fun setMode(mode: ProtectionModeUI) {
+        SecurityEngine.setMode(mode)
+    }
+
+    private fun updateButtonState() {
+
+        val state = _uiState.value
+
+        val enabled = when (state.selectedMode) {
+
+            ProtectionModeUI.CHARGER -> {
+                if (state.isMonitoring) {
+                    true
+                } else {
+                    state.isCharging
+                }
+            }
+
+            ProtectionModeUI.PICKPOCKET -> {
+                if (state.isMonitoring) {
+                    true
+                } else {
+                    !state.isCharging   //  Only disable when charging
+                }
+            }
+        }
+
+        val text = when {
+            state.isMonitoring -> "Disarm"
+            else -> "Hold On"
+
+        }
+
+        _uiState.value = state.copy(
+            buttonEnabled = enabled,
+            buttonText = text
+        )
+    }
 
     // ---------------------------
     // Battery Receiver
@@ -63,8 +103,17 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
 
     init {
+
+        viewModelScope.launch {
+            SecurityEngine.mode.collect { mode ->
+                _uiState.value = _uiState.value.copy(
+                    selectedMode = mode
+                )
+                updateButtonState()
+            }
+        }
         app.contentResolver.registerContentObserver(
-            Settings.System.getUriFor(Settings.System.ALARM_ALERT),
+            Settings.System.CONTENT_URI,
             true,
             volumeObserver
         )
@@ -119,42 +168,31 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             SecurityEngine.state.collect { state ->
 
-                val charging = _uiState.value.isCharging
-
                 when (state) {
 
                     SecurityState.Idle -> {
                         _uiState.value = _uiState.value.copy(
                             isMonitoring = false,
-                            isAlertActive = false,
-                            buttonEnabled = charging,
-                            buttonText = "Hold On",
-                            chargingText = if (charging) "Charging"
-                            else "Plug in your charger"
+                            isAlertActive = false
                         )
                     }
 
                     SecurityState.Monitoring -> {
                         _uiState.value = _uiState.value.copy(
                             isMonitoring = true,
-                            isAlertActive = false,
-                            buttonEnabled = true,
-                            buttonText = "Disarm",
-                            chargingText = if (charging) "Charging"
-                            else "Plug in your charger"
+                            isAlertActive = false
                         )
                     }
 
                     is SecurityState.Alert -> {
                         _uiState.value = _uiState.value.copy(
                             isMonitoring = true,
-                            isAlertActive = true,
-                            buttonEnabled = true,
-                            buttonText = "Disarm",
-                            chargingText = "Charger Removed!"
+                            isAlertActive = true
                         )
                     }
                 }
+
+                updateButtonState()
             }
         }
     }
@@ -193,15 +231,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
         _uiState.value = _uiState.value.copy(
             isCharging = charging,
-            batteryPercent = batteryPercent,
-            chargingText = if (_uiState.value.isAlertActive) {
-                "Charger Removed!"
-            } else {
-                if (charging) "Charging"
-                else "Plug in your charger"
-            },
-            buttonEnabled = if (_uiState.value.isMonitoring) true else charging
+            batteryPercent = batteryPercent
         )
+
+        updateButtonState()
     }
 
     private fun isDeviceCharging(): Boolean {

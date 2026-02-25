@@ -10,13 +10,17 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalConfiguration
@@ -25,14 +29,26 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.silentchaos.holdon.R
 import com.silentchaos.holdon.biometric.Authenticator
 import com.silentchaos.holdon.engine.SecurityEngineService
+import com.silentchaos.holdon.ui.Components.AlarmVolumeSection
+import com.silentchaos.holdon.ui.Components.ChargingStatusSection
+import com.silentchaos.holdon.ui.Components.ModeToggleBar
+import com.silentchaos.holdon.ui.Components.PickPocketInfoCard
+import com.silentchaos.holdon.ui.Components.PickPocketStatusSection
 import com.silentchaos.holdon.ui.Components.TopBar
 import com.silentchaos.holdon.ui.viewmodel.HomeViewModel
+
+enum class ProtectionModeUI {
+    CHARGER,
+    PICKPOCKET
+}
+
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -53,14 +69,24 @@ fun HomeScreen(
 
     val authenticator = remember { Authenticator() }
 
+    val selectedMode = uiState.selectedMode
 
-    val isCharging = uiState.isCharging
+
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
-            TopBar(onInfoClick, onSettingClick, screenWidth, screenHeight)
+            TopBar(
+                onInfoClick = onInfoClick,
+                onSettingClick = onSettingClick,
+                screenWidth = screenWidth,
+                screenHeight = screenHeight,
+                centerContent = {
+
+                }
+            )
+
         },
         bottomBar = {
             Box(
@@ -74,19 +100,29 @@ fun HomeScreen(
 
                         if (!uiState.isMonitoring) {
 
-                            //  START MONITORING
+                            // START with selected mode
                             val intent = Intent(
                                 context,
                                 SecurityEngineService::class.java
                             ).apply {
                                 action = SecurityEngineService.ACTION_START
+                                putExtra(
+                                    SecurityEngineService.EXTRA_MODE,
+                                    when (uiState.selectedMode) {
+                                        ProtectionModeUI.CHARGER ->
+                                            SecurityEngineService.MODE_CHARGER
+
+                                        ProtectionModeUI.PICKPOCKET ->
+                                            SecurityEngineService.MODE_PICKPOCKET
+                                    }
+                                )
                             }
 
                             ContextCompat.startForegroundService(context, intent)
 
                         } else {
 
-                            // STOP WITH AUTHENTICATION
+                            // STOP with authentication
                             activity?.let { act ->
                                 authenticator.authenticate(
                                     activity = act,
@@ -101,10 +137,9 @@ fun HomeScreen(
 
                                         ContextCompat.startForegroundService(context, stopIntent)
 
-
                                         Toast.makeText(
                                             context,
-                                            "Monitoring stopped",
+                                            "Protection disabled",
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     }
@@ -129,6 +164,36 @@ fun HomeScreen(
             }
         }
     ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.statusBars)
+        ){
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 40.dp),
+                contentAlignment = Alignment.Center
+            ){
+                ModeToggleBar(
+                    selectedMode = selectedMode,
+                    onModeSelected = { mode ->
+                        if (!uiState.isMonitoring) {
+                            viewModel.setMode(mode)
+                        }
+                    },
+                    isChargerEnabled =
+                        !uiState.isMonitoring || selectedMode == ProtectionModeUI.CHARGER,
+
+                    isPickPocketEnabled =
+                        !uiState.isMonitoring || selectedMode == ProtectionModeUI.PICKPOCKET
+                )
+            }
+
+//            if (selectedMode == ProtectionModeUI.PICKPOCKET) {
+//                PickPocketInfoCard()
+//            }
+
 
         Column(
             modifier = Modifier
@@ -138,16 +203,15 @@ fun HomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.size(220.dp)
-            ) {
 
-                if (isCharging) {
-                    CircularWavyProgressIndicator(
-                        progress = { uiState.batteryPercent / 100f },
-                        amplitude = { 1f },
-                        modifier = Modifier.fillMaxSize(),
+
+
+            when (selectedMode) {
+
+                ProtectionModeUI.CHARGER -> {
+                    ChargingStatusSection(
+                        isCharging = uiState.isCharging,
+                        batteryPercent = uiState.batteryPercent,
                         color = when {
                             uiState.batteryPercent < 20 ->
                                 MaterialTheme.colorScheme.error
@@ -156,151 +220,30 @@ fun HomeScreen(
                             else ->
                                 MaterialTheme.colorScheme.tertiary
                         },
-                        trackColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f),
-                        gapSize = 20.dp,
-                        wavelength = 80.dp,
-                        stroke = Stroke(
-                            width = 28f,   //  thickness in pixels
-                            cap = StrokeCap.Round
-                        ),
-                        waveSpeed = 40.dp
                     )
-
-
-            }
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-
-                    Icon(
-                        painter = painterResource(
-                            id = if (isCharging)
-                                R.drawable.smartphone_charging
-                            else
-                                R.drawable.smartphone
-                        ),
-                        contentDescription = null,
-                        modifier = Modifier.size(40.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-
-                    Spacer(Modifier.height(8.dp))
-
-                    if (isCharging) {
-                        Text(
-                            text = "  ${uiState.batteryPercent}%",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                    }
                 }
 
-
-
+                ProtectionModeUI.PICKPOCKET -> {
+                    PickPocketStatusSection(
+                        isMonitoring = uiState.isMonitoring
+                    )
+                }
             }
+
 
             Spacer(Modifier.height(20.dp))
 
-            Text(
-                text = uiState.chargingText,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
 
             Spacer(Modifier.height(40.dp))
 
             Spacer(Modifier.height(50.dp))
 
-            if (uiState.isCharging) {
-
-                val isLow = uiState.volumePercent < 50
-
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-
-                    Card(
-                        shape = RoundedCornerShape(18.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = if (isLow)
-                                MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.18f)
-                            else
-                                MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
-                        ),
-                        border = BorderStroke(
-                            1.dp,
-                            if (isLow)
-                                MaterialTheme.colorScheme.error.copy(alpha = 0.25f)
-                            else
-                                MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)
-                        ),
-                        modifier = Modifier
-                            .padding(vertical = 12.dp)
-                            .fillMaxWidth(0.9f)
-                    ) {
-
-                        Column(
-                            modifier = Modifier
-                                .padding(horizontal = 24.dp, vertical = 20.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-
-                            Text(
-                                text = if (isLow)
-                                    "Alarm volume is low"
-                                else
-                                    "Alarm volume looks good",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = if (isLow)
-                                    MaterialTheme.colorScheme.error
-                                else
-                                    MaterialTheme.colorScheme.primary,
-                                textAlign = TextAlign.Center
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = if (isLow)
-                                    "You might not hear the alert clearly."
-                                else
-                                    "You're good to go. You can adjust it anytime.",
-                                style = MaterialTheme.typography.bodySmall,
-                                textAlign = TextAlign.Center
-                            )
-
-                            Spacer(modifier = Modifier.height(6.dp))
-
-                            Text(
-                                text = "${uiState.volumePercent}%",
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.Bold
-                            )
-
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            Slider(
-                                value = uiState.volumePercent.toFloat(),
-                                onValueChange = { viewModel.setAlarmVolumeFromPercent(it) },
-                                valueRange = 0f..100f,
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = SliderDefaults.colors(
-                                    thumbColor = if (isLow)
-                                        MaterialTheme.colorScheme.error
-                                    else
-                                        MaterialTheme.colorScheme.primary,
-                                    activeTrackColor = if (isLow)
-                                        MaterialTheme.colorScheme.error
-                                    else
-                                        MaterialTheme.colorScheme.primary,
-                                    inactiveTrackColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                                )
-                            )
-                        }
-                    }
-                }
-            }
+            AlarmVolumeSection(
+                volumePercent = uiState.volumePercent,
+                onVolumeChange = { viewModel.setAlarmVolumeFromPercent(it) }
+            )
+        }
         }
     }
 }
+

@@ -24,7 +24,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun TopBar(onInfoClick : () -> Unit,onSettingClick : () -> Unit, screenWidth: Int, screenHeight: Int) {
+fun TopBar(onInfoClick : () -> Unit,onSettingClick : () -> Unit, screenWidth: Int,
+           screenHeight: Int,
+           centerContent: @Composable () -> Unit
+
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -54,6 +58,24 @@ fun TopBar(onInfoClick : () -> Unit,onSettingClick : () -> Unit, screenWidth: In
                 .clickable(
                     onClick = { onSettingClick() }
                 ),
+            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+        )
+
+        // Center toggle
+        Box(
+            modifier = Modifier.align(Alignment.Center)
+        ) {
+            centerContent()
+        }
+
+        Icon(
+            imageVector = Icons.Default.Settings,
+            contentDescription = "Settings",
+            modifier = Modifier
+                .width(screenWidth.dp * 0.05f)
+                .height(screenHeight.dp * 0.05f)
+                .align(Alignment.CenterEnd)
+                .clickable { onSettingClick() },
             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
         )
     }

@@ -32,6 +32,9 @@ import com.silentchaos.holdon.R
 
 @Composable
 fun AlarmAlertScreen(
+    countdownSeconds: Int? = null,
+    title: String = "Charger Disconnected",
+    subtitle: String = "Authenticate to stop the alert",
     onAuthenticate: () -> Unit
 ) {
 
@@ -59,7 +62,7 @@ fun AlarmAlertScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Charger Disconnected",
+                text = title,
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -67,10 +70,32 @@ fun AlarmAlertScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Authenticate to stop the alert",
+                text = subtitle,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                textAlign = TextAlign.Center
             )
+
+            // 🔥 Countdown Section (Only if provided)
+            if (countdownSeconds != null) {
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Text(
+                    text = "$countdownSeconds",
+                    style = MaterialTheme.typography.displayLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.error
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Seconds remaining",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+            }
 
             Spacer(modifier = Modifier.height(40.dp))
 
