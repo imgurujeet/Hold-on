@@ -13,6 +13,7 @@ import android.os.Looper
 import android.provider.Settings
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.silentchaos.holdon.data.preferences.AppPreferencesImpl
 import com.silentchaos.holdon.engine.SecurityEngine
 import com.silentchaos.holdon.engine.SecurityState
 import com.silentchaos.holdon.ui.ProtectionModeUI
@@ -31,12 +32,16 @@ data class HomeUiState(
     val volumePercent: Int = 0,
     val batteryPercent: Int = 0,
     val buttonEnabled: Boolean = false,
-    val buttonText: String = "Activate"
+    val buttonText: String = "Activate",
+    val pickPocketMode: String = "normal",
+    val motionThreshold: Float = 5f,
+    val verificationDelay: Long = 2000L
 )
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val app = application
+    private val preferences = AppPreferencesImpl(app)
 
     private val audioManager =
         app.getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -103,6 +108,39 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
 
     init {
+
+        viewModelScope.launch {
+            combine(
+                preferences.pickPocketMode,
+                preferences.motionThreshold,
+                preferences.verificationDelay
+            ) { mode, threshold, delay ->
+                Triple(mode, threshold, delay)
+            }.collect { (mode, threshold, delay) ->
+
+                val finalThreshold = when (mode) {
+                    "high" -> 3f
+                    "crowded" -> 5f
+                    "custom" -> threshold
+                    else -> 8f
+                }
+
+                val finalDelay = when (mode) {
+                    "high" -> 5000L
+                    "crowded" -> 2000L
+                    "custom" -> delay
+                    else -> 8000L
+                }
+
+                _uiState.value = _uiState.value.copy(
+                    pickPocketMode = mode,
+                    motionThreshold = finalThreshold,
+                    verificationDelay = finalDelay
+                )
+            }
+        }
+
+
 
         viewModelScope.launch {
             SecurityEngine.mode.collect { mode ->
@@ -257,4 +295,26 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         app.contentResolver.unregisterContentObserver(volumeObserver)
         super.onCleared()
     }
+
+
+    //pickpocket sensor value
+
+    fun setPickPocketMode(mode: String) {
+        viewModelScope.launch {
+            preferences.setPickPocketMode(mode)
+        }
+    }
+
+    fun setMotionThreshold(value: Float) {
+        viewModelScope.launch {
+            preferences.setMotionThreshold(value)
+        }
+    }
+
+    fun setVerificationDelay(value: Long) {
+        viewModelScope.launch {
+            preferences.setVerificationDelay(value)
+        }
+    }
+
 }

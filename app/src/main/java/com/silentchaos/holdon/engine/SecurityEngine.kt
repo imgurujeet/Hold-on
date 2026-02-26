@@ -23,8 +23,19 @@ object SecurityEngine {
     private val _mode = MutableStateFlow(ProtectionModeUI.CHARGER)
     val mode: StateFlow<ProtectionModeUI> = _mode
 
+    // -----------------------------
+    // PickPocket Config
+    // -----------------------------
+
+    var currentVerificationDelay: Long = 5000L
+        private set
+
     fun setMode(mode: ProtectionModeUI) {
         _mode.value = mode
+    }
+
+    fun updatePickPocketVerificationDelay(configDelay: Long) {
+        currentVerificationDelay = configDelay
     }
 
     // -----------------------------

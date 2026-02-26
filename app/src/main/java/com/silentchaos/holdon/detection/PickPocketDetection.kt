@@ -5,39 +5,59 @@ import android.content.Context
 import android.hardware.*
 import kotlin.math.sqrt
 
+data class PickPocketConfig(
+    val motionThreshold: Float,
+    val verificationDelay: Long
+)
+
 class PickPocketDetection(
     private val context: Context,
+    private val config: PickPocketConfig,
     private val onSuspiciousMovement: () -> Unit
 ) : SensorEventListener {
 
-    private var sensorManager: SensorManager? = null
-    private var accelerometer: Sensor? = null
-    private var proximity: Sensor? = null
+    private val sensorManager =
+        context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+
+    private val accelerometer: Sensor? =
+        sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
+
+    private val proximity: Sensor? =
+        sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY)
 
     private var wasCovered = false
-    private var lastAcceleration = 0f
     private var uncoverTime = 0L
+    private var isRunning = false
+
+    private var motionStartTime = 0L
+    private var motionActive = false
+
+    val hasAccelerometer: Boolean
+        get() = accelerometer != null
+
+    val hasProximity: Boolean
+        get() = proximity != null
 
     fun start() {
-        sensorManager =
-            context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
-        accelerometer =
-            sensorManager?.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
+        if (!hasAccelerometer) {
+            // Cannot detect without motion sensor
+            return
+        }
 
-        proximity =
-            sensorManager?.getDefaultSensor(Sensor.TYPE_PROXIMITY)
+        if (isRunning) return
+        isRunning = true
 
-        accelerometer?.also {
-            sensorManager?.registerListener(
+        accelerometer?.let {
+            sensorManager.registerListener(
                 this,
                 it,
-                SensorManager.SENSOR_DELAY_GAME // 🔥 faster
+                SensorManager.SENSOR_DELAY_GAME
             )
         }
 
-        proximity?.also {
-            sensorManager?.registerListener(
+        proximity?.let {
+            sensorManager.registerListener(
                 this,
                 it,
                 SensorManager.SENSOR_DELAY_NORMAL
@@ -46,8 +66,9 @@ class PickPocketDetection(
     }
 
     fun stop() {
-        sensorManager?.unregisterListener(this)
-        sensorManager = null
+        if (!isRunning) return
+        sensorManager.unregisterListener(this)
+        isRunning = false
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
@@ -56,13 +77,16 @@ class PickPocketDetection(
         when (event.sensor.type) {
 
             Sensor.TYPE_PROXIMITY -> {
+
+                if (!hasProximity) return
+
                 val distance = event.values[0]
                 val maxRange = proximity?.maximumRange ?: 5f
 
                 val covered = distance < maxRange
 
                 if (wasCovered && !covered) {
-                    // Transition: covered → uncovered
+                    // Covered → Uncovered transition
                     uncoverTime = System.currentTimeMillis()
                 }
 
@@ -71,26 +95,54 @@ class PickPocketDetection(
 
             Sensor.TYPE_LINEAR_ACCELERATION -> {
 
+                if (!hasAccelerometer) return
+
                 val x = event.values[0]
                 val y = event.values[1]
                 val z = event.values[2]
 
                 val movement = sqrt(x * x + y * y + z * z)
-
                 val now = System.currentTimeMillis()
 
-                // More realistic threshold
-                if (movement > 5.0f && now - uncoverTime < 2000 &&
-                    now - uncoverTime < 2000 // 2 seconds window
-                ) {
+                // Smart fallback logic
+                val effectiveThreshold =
+                    if (hasProximity)
+                        config.motionThreshold
+                    else
+                        config.motionThreshold * 1.4f // Increase if no proximity
 
-                    val keyguard =
-                        context.getSystemService(Context.KEYGUARD_SERVICE)
-                                as KeyguardManager
+                val withinWindow =
+                    if (hasProximity)
+                        now - uncoverTime < config.verificationDelay
+                    else
+                        true // No proximity → rely only on motion
 
-                    if (keyguard.isDeviceLocked) {
-                        onSuspiciousMovement()
+
+
+                if (movement > effectiveThreshold && withinWindow) {
+
+                    if (!motionActive) {
+                        motionActive = true
+                        motionStartTime = now
                     }
+
+                    val sustained = now - motionStartTime > 200 // 200ms sustained motion
+
+                    if (sustained) {
+
+                        val keyguard =
+                            context.getSystemService(Context.KEYGUARD_SERVICE)
+                                    as KeyguardManager
+
+                        if (keyguard.isDeviceLocked) {
+                            onSuspiciousMovement()
+                        }
+
+                        motionActive = false
+                    }
+
+                } else {
+                    motionActive = false
                 }
             }
         }

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -199,3 +200,18 @@ private fun SegmentedItem(
         }
     }
 }
+
+@Composable
+fun PickPocketModeSelector(
+    currentMode: String,
+    onClick: () -> Unit
+) {
+
+    FilledTonalButton(
+        onClick = onClick,
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Text("Sensitivity: ${currentMode.capitalize()}")
+    }
+}
+

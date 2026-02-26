@@ -40,6 +40,8 @@ import com.silentchaos.holdon.ui.Components.AlarmVolumeSection
 import com.silentchaos.holdon.ui.Components.ChargingStatusSection
 import com.silentchaos.holdon.ui.Components.ModeToggleBar
 import com.silentchaos.holdon.ui.Components.PickPocketInfoCard
+import com.silentchaos.holdon.ui.Components.PickPocketModeSelector
+import com.silentchaos.holdon.ui.Components.PickPocketModeSheet
 import com.silentchaos.holdon.ui.Components.PickPocketStatusSection
 import com.silentchaos.holdon.ui.Components.TopBar
 import com.silentchaos.holdon.ui.viewmodel.HomeViewModel
@@ -50,7 +52,7 @@ enum class ProtectionModeUI {
 }
 
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onInfoClick: () -> Unit,
@@ -70,6 +72,7 @@ fun HomeScreen(
     val authenticator = remember { Authenticator() }
 
     val selectedMode = uiState.selectedMode
+    var showSheet by remember { mutableStateOf(false) }
 
 
 
@@ -190,11 +193,6 @@ fun HomeScreen(
                 )
             }
 
-//            if (selectedMode == ProtectionModeUI.PICKPOCKET) {
-//                PickPocketInfoCard()
-//            }
-
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -227,6 +225,13 @@ fun HomeScreen(
                     PickPocketStatusSection(
                         isMonitoring = uiState.isMonitoring
                     )
+                    Spacer(Modifier.height(16.dp))
+
+                    PickPocketModeSelector(
+                        currentMode = uiState.pickPocketMode,
+                        onClick = { showSheet = true }
+                    )
+
                 }
             }
 
@@ -244,6 +249,31 @@ fun HomeScreen(
             )
         }
         }
+
+        if (showSheet) {
+
+            ModalBottomSheet(
+                onDismissRequest = { showSheet = false },
+                sheetState = rememberModalBottomSheetState()
+            ) {
+                PickPocketModeSheet(
+                    currentMode = uiState.pickPocketMode,
+                    motionThreshold = uiState.motionThreshold,
+                    verificationDelay = uiState.verificationDelay,
+                    onModeSelected = {
+                        viewModel.setPickPocketMode(it)
+                    },
+                    onThresholdChange = {
+                        viewModel.setMotionThreshold(it)
+                    },
+                    onDelayChange = {
+                        viewModel.setVerificationDelay(it)
+                    }
+                )
+            }
+        }
     }
 }
+
+
 

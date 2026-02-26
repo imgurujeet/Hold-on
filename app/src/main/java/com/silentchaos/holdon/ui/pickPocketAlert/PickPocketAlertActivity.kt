@@ -26,7 +26,7 @@ class PickPocketAlertActivity : FragmentActivity() {
 
     private var remainingSeconds by mutableStateOf(5)
     private var timer: CountDownTimer? = null
-    private val verificationTimeMillis = 5000L // 5 seconds
+    private var verificationTimeMillis = 5000L// 5 seconds
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,7 +77,10 @@ class PickPocketAlertActivity : FragmentActivity() {
 
     private fun startVerificationTimer() {
 
-        remainingSeconds = 5
+        verificationTimeMillis = SecurityEngine.currentVerificationDelay
+
+        val totalSeconds = (verificationTimeMillis / 1000).toInt()
+        remainingSeconds = totalSeconds
 
         timer = object : CountDownTimer(
             verificationTimeMillis,

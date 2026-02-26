@@ -1,21 +1,21 @@
 package com.silentchaos.holdon.engine
 
-import com.silentchaos.holdon.alert.AlertController
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.Service
+import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.os.BatteryManager
 import android.os.Build
 import android.os.IBinder
-import android.os.BatteryManager
 import androidx.core.app.NotificationCompat
 import com.silentchaos.holdon.alert.AlertAudioManager
+import com.silentchaos.holdon.alert.AlertController
 import com.silentchaos.holdon.alert.AlertNotificationManager
 import com.silentchaos.holdon.data.preferences.AppPreferencesImpl
 import com.silentchaos.holdon.detection.ChargerDetection
+import com.silentchaos.holdon.detection.PickPocketConfig
 import com.silentchaos.holdon.detection.PickPocketDetection
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 class SecurityEngineService : Service() {
 
@@ -32,7 +32,7 @@ class SecurityEngineService : Service() {
     }
 
     private lateinit var chargerDetection: ChargerDetection
-    private lateinit var pickPocketDetection: PickPocketDetection
+    private var pickPocketDetection: PickPocketDetection? = null
     private lateinit var alertController: AlertController
     private lateinit var preferences: AppPreferencesImpl
 
@@ -60,13 +60,6 @@ class SecurityEngineService : Service() {
             onChargerRemoved = { SecurityEngine.onChargerRemoved() },
             onChargerConnected = { SecurityEngine.onChargerConnected() }
         )
-
-        pickPocketDetection = PickPocketDetection(
-            context = this,
-            onSuspiciousMovement = {
-                SecurityEngine.onPickPocketDetected()
-            }
-        )
     }
 
     override fun onStartCommand(
@@ -78,10 +71,8 @@ class SecurityEngineService : Service() {
         when (intent?.action) {
 
             ACTION_START -> {
-
                 currentMode = intent.getStringExtra(EXTRA_MODE)
                     ?: MODE_CHARGER
-
                 startEngine()
             }
 
@@ -91,7 +82,6 @@ class SecurityEngineService : Service() {
             }
 
             null -> {
-                // System restarted service
                 startEngine()
             }
         }
@@ -124,8 +114,32 @@ class SecurityEngineService : Service() {
                     return
                 }
 
+                // Read latest config from DataStore
+                val config = runBlocking {
+                    PickPocketConfig(
+                        motionThreshold = preferences.motionThreshold.first(),
+                        verificationDelay = preferences.verificationDelay.first()
+                    )
+                }
+
+                SecurityEngine.updatePickPocketVerificationDelay(config.verificationDelay)
+                pickPocketDetection = PickPocketDetection(
+                    context = this,
+                    config = config,
+                    onSuspiciousMovement = {
+                        SecurityEngine.onPickPocketDetected()
+                    }
+                )
+
+                // Disable feature if no accelerometer
+                if (pickPocketDetection?.hasAccelerometer == false) {
+                    isEngineRunning = false
+                    stopForeground(STOP_FOREGROUND_REMOVE)
+                    return
+                }
+
                 SecurityEngine.startMonitoring()
-                pickPocketDetection.start()
+                pickPocketDetection?.start()
             }
         }
     }
@@ -136,7 +150,7 @@ class SecurityEngineService : Service() {
         isEngineRunning = false
 
         chargerDetection.stop()
-        pickPocketDetection.stop()
+        pickPocketDetection?.stop()
 
         SecurityEngine.stopMonitoring()
 
@@ -147,7 +161,7 @@ class SecurityEngineService : Service() {
 
         if (isEngineRunning) {
             chargerDetection.stop()
-            pickPocketDetection.stop()
+            pickPocketDetection?.stop()
             SecurityEngine.stopMonitoring()
         }
 
