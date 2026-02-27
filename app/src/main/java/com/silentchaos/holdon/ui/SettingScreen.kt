@@ -1,8 +1,10 @@
 package com.silentchaos.holdon.ui
 
 import android.content.Intent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -13,9 +15,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,6 +31,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.silentchaos.holdon.R
@@ -44,6 +52,7 @@ fun SettingScreen(onBackClick :() -> Unit) {
 
     val viewModel: SettingsViewModel = viewModel()
     val uiState by viewModel.uiState.collectAsState()
+    var showFeedbackDialog by remember { mutableStateOf(false) }
 
 
 
@@ -128,10 +137,10 @@ fun SettingScreen(onBackClick :() -> Unit) {
 // LinkedIn
                SocialCard(
                    name = "LinkedIn",
-                   url = "https://www.linkedin.com/in/gurujeet-k-975b8a288/",
+                   url = "https://www.linkedin.com/in/imgurujeet/",
                    onClick = {
                        val intent = Intent(Intent.ACTION_VIEW,
-                           "https://www.linkedin.com/in/gurujeet-k-975b8a288/".toUri())
+                           "https://www.linkedin.com/in/imgurujeet/".toUri())
                        ContextCompat.startActivity(context, intent, null)
                    },
                    icon = {
@@ -153,7 +162,7 @@ fun SettingScreen(onBackClick :() -> Unit) {
                    url = "https://www.instagram.com/imgurujeet",
                    onClick = {
                        val intent = Intent(Intent.ACTION_VIEW,
-                           "https://www.instagram.com/narwhal.25.1.1".toUri())
+                           "https://www.instagram.com/imgurujeet".toUri())
                        ContextCompat.startActivity(context, intent, null)
                    },
                    icon = {
@@ -170,19 +179,24 @@ fun SettingScreen(onBackClick :() -> Unit) {
                )
 
 // Email
+               Spacer(modifier = Modifier.height(24.dp))
+
+               Text(
+                   text = "Support",
+                   style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                   color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+               )
+
+               Spacer(modifier = Modifier.height(8.dp))
+
                SocialCard(
-                   name = "Email",
-                   url = "mailto:imgurujeet@gmail.com",
-                   onClick = {
-                       val intent = Intent(Intent.ACTION_SENDTO).apply {
-                           data = "mailto:imgurujeet@gmail.com".toUri()
-                       }
-                       ContextCompat.startActivity(context, intent, null)
-                   },
+                   name = "Give Feedback",
+                   url = "",
+                   onClick = { showFeedbackDialog = true },
                    icon = {
                        Icon(
                            painter = painterResource(id = R.drawable.email_social_media_black_icon),
-                           contentDescription = "Email Icon",
+                           contentDescription = "Feedback Icon",
                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                            modifier = Modifier.size(
                                width = (screenWidth * 0.06f).dp,
@@ -206,6 +220,12 @@ fun SettingScreen(onBackClick :() -> Unit) {
                    )
                }
 
+               if (showFeedbackDialog) {
+                   FeedbackDialog(
+                       onDismiss = { showFeedbackDialog = false },
+                   )
+               }
+
            }
 
 
@@ -222,3 +242,182 @@ fun SettingScreen(onBackClick :() -> Unit) {
 
 
 
+@Composable
+fun FeedbackDialog(
+    onDismiss: () -> Unit,
+) {
+    val context = LocalContext.current
+    var selectedType by remember { mutableStateOf("Report Issue") }
+    var message by remember { mutableStateOf("") }
+    var includeLogs by remember { mutableStateOf(false) }
+
+    val options = listOf(
+        "Report Issue",
+        "Share an Idea"
+    )
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "Send Feedback",
+                style = MaterialTheme.typography.titleLarge
+            )
+        },
+        text = {
+            Column {
+
+                // ---------- Horizontal Selection ----------
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    options.forEach { option ->
+                        val isSelected = selectedType == option
+
+                        Surface(
+                            shape = MaterialTheme.shapes.medium,
+                            tonalElevation = if (isSelected) 4.dp else 0.dp,
+                            color = if (isSelected)
+                                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f)
+                            else
+                                MaterialTheme.colorScheme.surfaceVariant,
+                            modifier = Modifier
+                                .weight(1f)
+                                .clickable {
+                                    selectedType = option
+                                    if (option != "Report Issue") {
+                                        includeLogs = false
+                                    }
+                                }
+                               ,
+
+                        ) {
+                            Text(
+                                text = option,
+                                modifier = Modifier.padding(
+                                    vertical = 12.dp,
+                                    horizontal = 8.dp
+                                ),
+                                style = MaterialTheme.typography.bodySmall,
+                                textAlign = TextAlign.Center,
+                                color = if (isSelected)
+                                    MaterialTheme.colorScheme.onPrimaryContainer
+                                else
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // ---------- Message ----------
+                OutlinedTextField(
+                    value = message,
+                    onValueChange = { message = it },
+                    label = { Text("Your Message") },
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 4,
+                    shape = RoundedCornerShape(10.dp)
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // ---------- Include Logs (Only for Report Issue) ----------
+                if (selectedType == "Report Issue") {
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { includeLogs = !includeLogs }
+                    ) {
+                        Checkbox(
+                            checked = includeLogs,
+                            onCheckedChange = { includeLogs = it }
+                        )
+                        Text(
+                            text = "Include debug logs",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Text(
+                text = "Send",
+                modifier = Modifier
+                    .padding(8.dp)
+                    .clickable(enabled = message.isNotBlank()) {
+
+                        val deviceInfo = if (includeLogs && selectedType == "Report Issue") {
+
+                            val packageInfo = context.packageManager
+                                .getPackageInfo(context.packageName, 0)
+
+                            """
+                    
+                    -------- Device Information --------
+                    App Version: ${packageInfo.versionName}
+                    Version Code: ${packageInfo.longVersionCode}
+                    
+                    Manufacturer: ${android.os.Build.MANUFACTURER}
+                    Model: ${android.os.Build.MODEL}
+                    Brand: ${android.os.Build.BRAND}
+                    
+                    Android Version: ${android.os.Build.VERSION.RELEASE}
+                    SDK Level: ${android.os.Build.VERSION.SDK_INT}
+                    
+                    Device: ${android.os.Build.DEVICE}
+                    Product: ${android.os.Build.PRODUCT}
+                    Hardware: ${android.os.Build.HARDWARE}
+                    
+                    ------------------------------------
+                    
+                    """.trimIndent()
+
+                        } else ""
+
+                        val fullMessage = """
+                    $message
+                    $deviceInfo
+                """.trimIndent()
+
+                        val uri = android.net.Uri.Builder()
+                            .scheme("mailto")
+                            .opaquePart("imgurujeet@gmail.com")
+                            .appendQueryParameter("subject", selectedType)
+                            .appendQueryParameter("body", fullMessage)
+                            .build()
+
+                        val intent = Intent(Intent.ACTION_SENDTO).apply {
+                            data = uri
+                        }
+
+                        context.startActivity(intent)
+
+                        context.startActivity(
+                            Intent.createChooser(intent, "Send Feedback")
+                        )
+
+                        context.startActivity(intent)
+                        onDismiss()
+                    },
+                color = if (message.isNotBlank())
+                    MaterialTheme.colorScheme.primary
+                else
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+            )
+        },
+        dismissButton = {
+            Text(
+                text = "Cancel",
+                modifier = Modifier
+                    .padding(8.dp)
+                    .clickable { onDismiss() }
+            )
+        }
+    )
+}

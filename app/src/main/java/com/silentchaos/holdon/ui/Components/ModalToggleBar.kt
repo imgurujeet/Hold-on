@@ -195,7 +195,7 @@ private fun SegmentedItem(
                 color = contentColor.copy(alpha = 0.5f),
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(top = 5.dp, end = 20.dp)
+                    .padding(top = 5.dp, end = 10.dp)
             )
         }
     }

@@ -21,6 +21,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 data class HomeUiState(
@@ -110,26 +111,22 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     init {
 
         viewModelScope.launch {
-            combine(
-                preferences.pickPocketMode,
-                preferences.motionThreshold,
-                preferences.verificationDelay
-            ) { mode, threshold, delay ->
-                Triple(mode, threshold, delay)
-            }.collect { (mode, threshold, delay) ->
+            preferences.pickPocketMode.collect { mode ->
 
-                val finalThreshold = when (mode) {
-                    "high" -> 3f
-                    "crowded" -> 5f
-                    "custom" -> threshold
-                    else -> 8f
+                val (finalThreshold, finalDelay) = when (mode) {
+                    "high" -> 3f to 1000L
+                    "crowded" -> 5f to 3000L
+                    "normal" -> 8f to 8000L
+                    "custom" -> {
+                        val threshold = preferences.motionThreshold.first()
+                        val delay = preferences.verificationDelay.first()
+                        threshold to delay
+                    }
+                    else -> 8f to 8000L
                 }
-
-                val finalDelay = when (mode) {
-                    "high" -> 5000L
-                    "crowded" -> 2000L
-                    "custom" -> delay
-                    else -> 8000L
+                if (mode != "custom") {
+                    preferences.setMotionThreshold(finalThreshold)
+                    preferences.setVerificationDelay(finalDelay)
                 }
 
                 _uiState.value = _uiState.value.copy(
@@ -137,6 +134,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     motionThreshold = finalThreshold,
                     verificationDelay = finalDelay
                 )
+
             }
         }
 
