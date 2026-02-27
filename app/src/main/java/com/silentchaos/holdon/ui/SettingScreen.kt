@@ -1,6 +1,7 @@
 package com.silentchaos.holdon.ui
 
 import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -385,22 +386,14 @@ fun FeedbackDialog(
                     $deviceInfo
                 """.trimIndent()
 
-                        val uri = android.net.Uri.Builder()
-                            .scheme("mailto")
-                            .opaquePart("imgurujeet@gmail.com")
-                            .appendQueryParameter("subject", selectedType)
-                            .appendQueryParameter("body", fullMessage)
-                            .build()
-
                         val intent = Intent(Intent.ACTION_SENDTO).apply {
-                            data = uri
+                            data = Uri.parse("mailto:")
+                            putExtra(Intent.EXTRA_EMAIL, arrayOf("imgurujeet@gmail.com"))
+                            putExtra(Intent.EXTRA_SUBJECT, selectedType)
+                            putExtra(Intent.EXTRA_TEXT, fullMessage)
                         }
 
-                        context.startActivity(intent)
-
-                        context.startActivity(
-                            Intent.createChooser(intent, "Send Feedback")
-                        )
+                        context.startActivity(Intent.createChooser(intent, "Send Feedback"))
 
                         context.startActivity(intent)
                         onDismiss()

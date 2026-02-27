@@ -50,6 +50,11 @@ class AlertNotificationManager(
                     Intent.FLAG_ACTIVITY_CLEAR_TOP or
                     Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
+        val alertTitle = "Security Alert"
+        val alertMessage = when (type) {
+            AlertType.CHARGER -> "Charger disconnected. Authentication required."
+            AlertType.PICKPOCKET -> "Suspicious movement detected. Authentication required."
+        }
 
         val stopPendingIntent = PendingIntent.getActivity(
             context,
@@ -60,8 +65,8 @@ class AlertNotificationManager(
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
-            .setContentTitle("🚨 Charger Disconnected")
-            .setContentText("Authenticate to stop the alert")
+            .setContentTitle(alertTitle)
+            .setContentText(alertMessage)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
