@@ -3,6 +3,7 @@ package com.silentchaos.holdon.detection
 import android.app.KeyguardManager
 import android.content.Context
 import android.hardware.*
+import android.widget.Toast
 import kotlin.math.sqrt
 
 data class PickPocketConfig(
@@ -19,8 +20,13 @@ class PickPocketDetection(
     private val sensorManager =
         context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
-    private val accelerometer: Sensor? =
+    private val linearAccel: Sensor? =
         sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
+
+    private val rawAccel: Sensor? =
+        sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+
+    private val accelerometer: Sensor? = linearAccel ?: rawAccel
 
     private val proximity: Sensor? =
         sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY)
@@ -42,6 +48,13 @@ class PickPocketDetection(
 
         if (!hasAccelerometer) {
             // Cannot detect without motion sensor
+
+            Toast.makeText(
+                context,
+                "Your device does not support motion detection (accelerometer missing)",
+                Toast.LENGTH_LONG
+            ).show()
+
             return
         }
 

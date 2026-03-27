@@ -12,8 +12,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
@@ -28,6 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
@@ -50,7 +54,6 @@ enum class ProtectionModeUI {
     CHARGER,
     PICKPOCKET
 }
-
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -153,7 +156,6 @@ fun HomeScreen(
                     enabled = uiState.buttonEnabled,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(screenHeight.dp * 0.05f)
                 ) {
                     Text(
                         text = uiState.buttonText,
@@ -167,87 +169,79 @@ fun HomeScreen(
             }
         }
     ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .windowInsetsPadding(WindowInsets.statusBars)
-        ){
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 40.dp),
-                contentAlignment = Alignment.Center
-            ){
-                ModeToggleBar(
-                    selectedMode = selectedMode,
-                    onModeSelected = { mode ->
-                        if (!uiState.isMonitoring) {
-                            viewModel.setMode(mode)
-                        }
-                    },
-                    isChargerEnabled =
-                        !uiState.isMonitoring || selectedMode == ProtectionModeUI.CHARGER,
-
-                    isPickPocketEnabled =
-                        !uiState.isMonitoring || selectedMode == ProtectionModeUI.PICKPOCKET
-                )
-            }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+               .windowInsetsPadding(WindowInsets.statusBars),
+            horizontalAlignment = Alignment.CenterHorizontally,
 
+        ){
+            Spacer(Modifier.height(16.dp))
 
-
-
-            when (selectedMode) {
-
-                ProtectionModeUI.CHARGER -> {
-                    ChargingStatusSection(
-                        isCharging = uiState.isCharging,
-                        batteryPercent = uiState.batteryPercent,
-                        color = when {
-                            uiState.batteryPercent < 20 ->
-                                MaterialTheme.colorScheme.error
-                            uiState.batteryPercent > 80 ->
-                                MaterialTheme.colorScheme.primary
-                            else ->
-                                MaterialTheme.colorScheme.tertiary
-                        },
-                    )
-                }
-
-                ProtectionModeUI.PICKPOCKET -> {
-                    PickPocketStatusSection(
-                        isMonitoring = uiState.isMonitoring
-                    )
-                    Spacer(Modifier.height(16.dp))
-
-                    PickPocketModeSelector(
-                        currentMode = uiState.pickPocketMode,
-                        onClick = { showSheet = true }
-                    )
-
-                }
-            }
-
-
-            Spacer(Modifier.height(20.dp))
-
-
-            Spacer(Modifier.height(40.dp))
-
-            Spacer(Modifier.height(50.dp))
-
-            AlarmVolumeSection(
-                volumePercent = uiState.volumePercent,
-                onVolumeChange = { viewModel.setAlarmVolumeFromPercent(it) }
+            ModeToggleBar(
+                selectedMode = selectedMode,
+                onModeSelected = {
+                    if (!uiState.isMonitoring) viewModel.setMode(it)
+                },
+                isChargerEnabled =
+                    !uiState.isMonitoring || selectedMode == ProtectionModeUI.CHARGER,
+                isPickPocketEnabled =
+                    !uiState.isMonitoring || selectedMode == ProtectionModeUI.PICKPOCKET
             )
-        }
+
+            Spacer(Modifier.height(24.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceEvenly
+            ) {
+
+                //  Main section
+                when (selectedMode) {
+
+                    ProtectionModeUI.CHARGER -> {
+                        ChargingStatusSection(
+                            isCharging = uiState.isCharging,
+                            batteryPercent = uiState.batteryPercent,
+                            color = when {
+                                uiState.batteryPercent < 20 ->
+                                    MaterialTheme.colorScheme.error
+                                uiState.batteryPercent > 80 ->
+                                    MaterialTheme.colorScheme.primary
+                                else ->
+                                    MaterialTheme.colorScheme.tertiary
+                            }
+                        )
+                    }
+
+                    ProtectionModeUI.PICKPOCKET -> {
+                        PickPocketStatusSection(
+                            isMonitoring = uiState.isMonitoring
+                        )
+
+                        Spacer(Modifier.height(16.dp))
+
+                        PickPocketModeSelector(
+                            currentMode = uiState.pickPocketMode,
+                            onClick = { showSheet = true }
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(24.dp))
+
+                //  Volume ALWAYS visible now
+                AlarmVolumeSection(
+                    volumePercent = uiState.volumePercent,
+                    onVolumeChange = {
+                        viewModel.setAlarmVolumeFromPercent(it)
+                    }
+                )
+
+                Spacer(Modifier.height(80.dp))
+            }
         }
 
         if (showSheet) {

@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
@@ -37,6 +39,7 @@ fun PickPocketModeSheet(
         modifier = Modifier
             .fillMaxWidth()
             .padding(24.dp)
+            .verticalScroll(rememberScrollState())
     ) {
 
         Text(
@@ -185,7 +188,7 @@ fun PickPocketModeSheet(
             }
         }
 
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(32.dp))
     }
 }
 
